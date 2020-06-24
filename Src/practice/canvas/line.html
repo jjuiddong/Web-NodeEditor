@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+  </head>
+  <body onload="draw();">
+    <canvas id="canvas" width="800" height="800"></canvas>
+    <input type="text" id="miterLimit" value="20"></input>
+
+    <script type="application/javascript">
+      var offset = 0;
+
+      function draw() {
+        var canvas = document.getElementById("canvas");
+        if (canvas.getContext) {
+          var ctx = canvas.getContext("2d");
+
+          // for (var i = 0; i < 10; i++) {
+          //   ctx.lineWidth = 1 + i;
+          //   ctx.beginPath();
+          //   ctx.moveTo(5 + i * 14, 5);
+          //   ctx.lineTo(5 + i * 14, 140);
+          //   ctx.stroke();
+          // }
+
+          // var lineCap = ["butt", "round", "square"];
+          // // 안내선을 그린다
+          // ctx.strokeStyle = "#09f";
+          // ctx.beginPath();
+          // ctx.moveTo(10, 10);
+          // ctx.lineTo(140, 10);
+          // ctx.moveTo(10, 140);
+          // ctx.lineTo(140, 140);
+          // ctx.stroke();
+
+          // // 선을 그린다
+          // ctx.strokeStyle = "black";
+          // for (var i = 0; i < lineCap.length; i++) {
+          //   ctx.lineWidth = 15;
+          //   ctx.lineCap = lineCap[i];
+          //   ctx.beginPath();
+          //   ctx.moveTo(25 + i * 50, 10);
+          //   ctx.lineTo(25 + i * 50, 140);
+          //   ctx.stroke();
+          // }
+
+          // var lineJoin = ["round", "bevel", "miter"];
+          // ctx.lineWidth = 10;
+          // for (var i = 0; i < lineJoin.length; i++) {
+          //   ctx.lineJoin = lineJoin[i];
+          //   ctx.beginPath();
+          //   ctx.moveTo(-5, 5 + i * 40);
+          //   ctx.lineTo(35, 45 + i * 40);
+          //   ctx.lineTo(75, 5 + i * 40);
+          //   ctx.lineTo(115, 45 + i * 40);
+          //   ctx.lineTo(155, 5 + i * 40);
+          //   ctx.stroke();
+          // }
+
+          // // 캔버스를 비운다
+          // ctx.clearRect(0, 0, 150, 150);
+          // // 안내선을 그린다
+          // ctx.strokeStyle = "#09f";
+          // ctx.lineWidth = 2;
+          // ctx.strokeRect(-5, 50, 160, 50);
+          // // 선 스타일을 설정한다
+          // ctx.strokeStyle = "#000";
+          // ctx.lineWidth = 10;
+          // // 입력 값을 검사한다
+          // if (
+          //   document.getElementById("miterLimit").value.match(/\d+(\.\d+)?/)
+          // ) {
+          //   ctx.miterLimit = parseFloat(
+          //     document.getElementById("miterLimit").value
+          //   );
+          // } else {
+          //   alert("Value must be a positive number");
+          // }
+          // // 선을 그린다
+          // ctx.beginPath();
+          // ctx.moveTo(0, 100);
+          // for (i = 0; i < 24; i++) {
+          //   var dy = i % 2 == 0 ? 25 : -25;
+          //   ctx.lineTo(Math.pow(i, 1.5) * 2, 75 + dy);
+          // }
+          // ctx.stroke();
+
+           ctx.clearRect(0, 0, canvas.width, canvas.height);
+           ctx.setLineDash([4, 2]);
+           ctx.lineDashOffset = -offset;
+           ctx.strokeRect(10, 10, 100, 100);
+        }
+      }
+
+      function march() {
+        offset++;
+        if (offset > 16) {
+          offset = 0;
+        }
+        draw();
+        setTimeout(march, 20);
+      }
+      march();
+
+    </script>
+  </body>
+</html>

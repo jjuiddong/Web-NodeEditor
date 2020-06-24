@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+  </head>
+  <body onload="draw();">
+    <canvas id="canvas" width="800" height="800"></canvas>
+    <script type="application/javascript">
+      function draw() {
+        var canvas = document.getElementById("canvas");
+        if (canvas.getContext) {
+          var ctx = canvas.getContext("2d");
+
+          // for (var i = 0; i < 3; i++) {
+          //   for (var j = 0; j < 3; j++) {
+          //     ctx.save();
+          //     ctx.fillStyle =
+          //       "rgb(" + 51 * i + ", " + (255 - 51 * i) + ", 255)";
+          //     ctx.translate(10 + j * 50, 10 + i * 50);
+          //     ctx.fillRect(0, 0, 25, 25);
+          //     ctx.restore();
+          //   }
+          // }
+
+          // ctx.save();
+          // // 파란 사각형
+          // ctx.fillStyle = "#0095DD";
+          // ctx.fillRect(30, 30, 100, 100);
+          // ctx.rotate((Math.PI / 180) * 25);
+          // // 회색 사각형
+          // ctx.fillStyle = "#4D4E53";
+          // ctx.fillRect(30, 30, 100, 100);
+          // ctx.restore();
+
+          // // 우측 사각형, 사각형 중심에서 회전하기
+          // // 파란 사각형 그리기
+          // ctx.fillStyle = "#0095DD";
+          // ctx.fillRect(150, 30, 100, 100);
+
+          // ctx.translate(200, 80); // 사각형 중심으로 이동하기
+          // // x = x + 0.5 * width
+          // // y = y + 0.5 * height
+          // ctx.rotate((Math.PI / 180) * 25); // 회전
+          // ctx.translate(-200, -80); // 예전 위치로 이동하기
+
+          // // 회색 사각형 그리기
+          // ctx.fillStyle = "#4D4E53";
+          // ctx.fillRect(150, 30, 100, 100);
+
+          //// 간단하지만 확대·축소 비율을 적용한 사각형 그리기
+          // ctx.save();
+          // ctx.scale(10, 3);
+          // ctx.fillRect(1, 10, 10, 10);
+          // ctx.restore();
+
+          // // 수평으로 대칭하기
+          // ctx.scale(-1, 1);
+          // ctx.font = "48px serif";
+          // ctx.fillText("MDN", -135, 120);
+
+          
+          var sin = Math.sin(Math.PI / 6);
+          var cos = Math.cos(Math.PI / 6);
+          ctx.translate(100, 100);
+          var c = 0;
+          for (var i = 0; i <= 12; i++) {
+            c = Math.floor((255 / 12) * i);
+            ctx.fillStyle = "rgb(" + c + ", " + c + ", " + c + ")";
+            ctx.fillRect(0, 0, 100, 10);
+            ctx.transform(cos, sin, -sin, cos, 0, 0);
+          }
+
+          ctx.setTransform(-1, 0, 0, 1, 100, 100);
+          ctx.fillStyle = "rgba(255, 128, 255, 0.5)";
+          ctx.fillRect(0, 50, 100, 100);
+        }
+      }
+    </script>
+  </body>
+</html>

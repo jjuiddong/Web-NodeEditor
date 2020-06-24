@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+  </head>
+  <body onload="init();">
+    <canvas id="canvas"></canvas>
+
+    <script type="application/javascript">
+      var canvas = document.getElementById("canvas");
+      canvas.width = window.innerWidth - 20;
+      canvas.height = window.innerHeight - 20;
+      var ctx = canvas.getContext("2d");
+      var _wnd = {};
+      var flag = 0;
+
+      function init() {
+        _wnd.state = 0;
+        _wnd.offset = [0, 0];
+        _wnd.rect = [10, 10, 100, 100]; //x,y,width,height
+
+        canvas.addEventListener("mousemove", (e) => {
+          if (_wnd.state === 1) {
+            _wnd.rect[0] = e.offsetX + _wnd.offset[0];
+            _wnd.rect[1] = e.offsetY + _wnd.offset[1];
+          }
+        });
+        canvas.addEventListener("mousedown", (e) => {
+          if (isPointInRect(_wnd.rect, e.offsetX, e.offsetY)) {
+            _wnd.state = 1;
+            _wnd.offset = [_wnd.rect[0] - e.offsetX, _wnd.rect[1] - e.offsetY];
+          }
+        });
+
+        canvas.addEventListener("mouseup", (e) => {
+          _wnd.state = 0;
+          if (isPointInRect(_wnd.rect, e.offsetX, e.offsetY)) {
+          }
+        });
+
+        window.requestAnimationFrame(draw);
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = "rgba(0,0,0,1)";
+        ctx.fillRect(_wnd.rect[0], _wnd.rect[1], _wnd.rect[2], _wnd.rect[3]);
+
+        window.requestAnimationFrame(draw);
+      }
+
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+
+      function isPointInRect(rect, x, y) {
+        if (
+          rect[0] < x &&
+          rect[0] + rect[2] > x &&
+          rect[1] < y &&
+          rect[1] + rect[3] > y
+        )
+          return true;
+        return false;
+      }
+
+      window.addEventListener("resize", resizeCanvas, false);
+    </script>
+  </body>
+</html>

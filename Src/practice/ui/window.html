@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <script src="config.js"></script>
+    <script src="window.js"></script>
+  </head>
+  <body onload="init();">
+    <canvas id="canvas"></canvas>
+
+    <script type="application/javascript">
+      var canvas = document.getElementById("canvas");
+      canvas.width = window.innerWidth - 20;
+      canvas.height = window.innerHeight - 20;
+      var ctx = canvas.getContext("2d");
+      var _wnd = new Window((option = { x: 10, y: 10, w: 200, h: 200 }));
+      var _wnd2 = new Window((option = { x: 210, y: 210, w: 200, h: 200 }));
+      var _wnds = [_wnd, _wnd2];
+
+      function init() {
+        canvas.addEventListener("mousemove", (e) => {
+          _wnds.forEach((wnd) => {
+            if (wnd.state === 1) {
+              wnd.move(e.offsetX + wnd.offset[0], e.offsetY + wnd.offset[1]);
+            }
+          });
+        });
+        canvas.addEventListener("mousedown", (e) => {
+          _wnds.forEach((wnd) => {
+            if (wnd.isPointInRect(e.offsetX, e.offsetY)) {
+              wnd.state = 1;
+              wnd.offset = [wnd.rect[0] - e.offsetX, wnd.rect[1] - e.offsetY];
+            }
+          })
+        });
+
+        canvas.addEventListener("mouseup", (e) => {
+          _wnds.forEach((wnd) => wnd.state=0);
+        });
+
+        window.requestAnimationFrame(draw);
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = "rgba(0,0,0,1)";
+        _wnds.forEach((wnd) => wnd.draw(ctx));
+
+        window.requestAnimationFrame(draw);
+      }
+
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+
+      window.addEventListener("resize", resizeCanvas, false);
+    </script>
+  </body>
+</html>

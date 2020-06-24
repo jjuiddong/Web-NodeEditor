@@ -1,0 +1,15 @@
+
+Web Node Editor Develop History
+
+
+-★ window render
+	-★ render window
+	-★ rectangle
+	-★ title
+-★ window titlebar
+
+- close button
+- max button
+- min button
+- window resize
+
