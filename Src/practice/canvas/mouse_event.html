@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+  </head>
+  <body onload="init();">
+    <canvas id="canvas" width="800" height="800"></canvas>
+
+    <script type="application/javascript">
+      var _wnd = {};
+
+      function init() {
+        var canvas = document.getElementById("canvas");
+        var ctx = canvas.getContext("2d");
+        _wnd.rect = new Path2D();
+        _wnd.rect.rect(10, 10, 100, 100);
+        canvas.addEventListener("mousemove", (e) => {
+          if (ctx.isPointInPath(_wnd.rect, e.offsetX, e.offsetY)) {
+            console.log("mouse move");
+          }
+        });
+        canvas.addEventListener("mousedown", (e) => {
+          if (ctx.isPointInPath(_wnd.rect, e.offsetX, e.offsetY)) {
+            console.log("mouse down");
+          }
+        });        
+
+        canvas.addEventListener("mouseup", (e) => {
+          if (ctx.isPointInPath(_wnd.rect, e.offsetX, e.offsetY)) {
+            console.log("mouse up");
+          }
+        });
+
+        canvas.addEventListener("click", (e) => {
+          if (ctx.isPointInPath(_wnd.rect, e.offsetX, e.offsetY)) {
+            console.log("click");
+          }
+        });
+
+
+        canvas.addEventListener("dblclick", (e) => {
+          if (ctx.isPointInPath(_wnd.rect, e.offsetX, e.offsetY)) {
+            console.log("dblclick");
+          }
+        });
+
+        canvas.addEventListener("mouseout", (e) => {
+          //if (ctx.isPointInPath(_wnd.rect, e.offsetX, e.offsetY)) {
+            console.log("mouse out");
+          //}
+        });
+
+        canvas.addEventListener("contextmenu", (e) => {
+          if (ctx.isPointInPath(_wnd.rect, e.offsetX, e.offsetY)) {
+            console.log("context menu");
+          }
+        });
+        canvas.addEventListener("wheel", (e) => {
+          if (ctx.isPointInPath(_wnd.rect, e.offsetX, e.offsetY)) {
+            console.log("wheel");
+          }
+        });        
+
+        window.requestAnimationFrame(draw);
+      }
+
+      function draw() {
+        var canvas = document.getElementById("canvas");
+        var ctx = canvas.getContext("2d");
+
+        // https://stackoverflow.com/questions/36337584/addhitregion-doesnt-work-in-chrome
+        //const rectangle = new Path2D();
+        ctx.beginPath();
+        //rectangle.rect(10, 10, 100, 100);
+        ctx.fill(_wnd.rect);
+
+      }
+
+    </script>
+  </body>
+</html>

@@ -11,7 +11,7 @@ const Window = class {
   }
 
   // draw window
-  draw = function (ctx) {
+  render = function (ctx) {
     var x = this.rect[0];
     var y = this.rect[1];
     var w = this.rect[2];
@@ -43,7 +43,7 @@ const Window = class {
   };
 
   // check x,y point in rect?
-  isPointInRect(x, y) {
+  isPointInRect = function(x, y) {
     if (
       this.rect[0] < x &&
       this.rect[0] + this.rect[2] > x &&

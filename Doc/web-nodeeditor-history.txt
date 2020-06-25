@@ -1,0 +1,21 @@
+
+Web Node Editor Develop History
+
+
+-★ window render
+	-★ render window
+	-★ rectangle
+	-★ title
+-★ window titlebar
+-★ background
+	-★ pattern drawing
+	-★ image filter disable
+- zoom in/out
+	- zoom in/out
+	- scroll	
+- button
+	- close button
+	- max button
+	- min button
+- window resize
+- typescript
