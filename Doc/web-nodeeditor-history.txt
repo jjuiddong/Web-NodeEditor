@@ -10,12 +10,26 @@ Web Node Editor Develop History
 -★ background
 	-★ pattern drawing
 	-★ image filter disable
-- zoom in/out
-	- zoom in/out
-	- scroll	
+-★ zoom in/out
+	-★ zoom in/out
+	-★ scroll
+-★ input/output slot
+- slot link
+	-★ selection
+		-★ slot hilight
+	- drag
+	- bezier line
 - button
 	- close button
 	- max button
 	- min button
+- line selection
+- widgets
+	- button
+	- edit
+		- text
+		- float,int
+	- combo box
 - window resize
 - typescript
+- popup menu

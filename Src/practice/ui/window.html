@@ -4,17 +4,30 @@
     <meta charset="utf-8" />
     <script src="./external/gl-matrix.js"></script>
     <script src="./math/vec2.js"></script>
+    <script src="./math/rect.js"></script>
+    <script src="util.js"></script>
+    <script src="link.js"></script>
     <script src="config.js"></script>
+    <script src="slot.js"></script>
     <script src="window.js"></script>    
     <script src="editview.js"></script>
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        width:100%;
+        height:100%;
+        background-color: #333;
+      }
+    </style>
   </head>
   <body onload="init();">
     <canvas id="canvas"></canvas>
 
     <script type="application/javascript">
       var canvas = document.getElementById("canvas");
-      canvas.width = window.innerWidth - 20;
-      canvas.height = window.innerHeight - 20;
+      canvas.width = window.innerWidth - 4;
+      canvas.height = window.innerHeight - 4;
       var ctx = canvas.getContext("2d");
       var _eview = null;
 
@@ -24,7 +37,6 @@
       }
 
       function render() {
-        //ctx.clearRect(0, 0, canvas.width, canvas.height);
         if (_eview) _eview.render(ctx);
         window.requestAnimationFrame(render);
       }
