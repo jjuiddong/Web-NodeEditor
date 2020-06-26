@@ -9,5 +9,5 @@ Node Editor with JavaScript and HTML
 - Develop History
   - https://github.com/jjuiddong/Web-NodeEditor/wiki
 - Recent ScreenShot
-  - <img src="https://github.com/jjuiddong/Web-NodeEditor/blob/master/Doc/zoom.jpg?raw=true" width="500px"/>
+  - <img src="https://github.com/jjuiddong/Web-NodeEditor/blob/master/Doc/link.jpg?raw=true" width="500px"/>
   
