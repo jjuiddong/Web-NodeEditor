@@ -1,5 +1,5 @@
 # Web-NodeEditor
-Node Editor with JavaScript 2D Canvas Rendering Context and HTML
+Node Editor with JavaScript CanvasRenderingContext2D and HTML
 
 - Reference Project
   - https://github.com/jagenjo/litegraph.js
