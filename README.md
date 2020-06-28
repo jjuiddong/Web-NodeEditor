@@ -6,7 +6,7 @@ Node Editor with JavaScript CanvasRenderingContext2D and HTML
 - HTML Canvas
   - https://developer.mozilla.org/ko/docs/Web/HTML/Canvas/Tutorial
   - https://joshondesign.com/p/books/canvasdeepdive/toc.html
-- Develop History
+- Develop History (ScreenShot)
   - https://github.com/jjuiddong/Web-NodeEditor/wiki
 - Recent ScreenShot
   - <img src="https://github.com/jjuiddong/Web-NodeEditor/blob/master/Doc/link.jpg?raw=true" width="500px"/>
