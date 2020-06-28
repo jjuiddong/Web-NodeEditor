@@ -23,7 +23,7 @@ Web Node Editor Develop History
 	-★ remove
 	-★ outline
 - popup menu
-	- add node	
+	- add node
 - button
 	- close button
 	- max button

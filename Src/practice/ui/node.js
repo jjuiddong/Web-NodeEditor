@@ -17,6 +17,7 @@ const Node = class {
     this.offset = new Vec2(0,0);
     this.rect = option.rect;
     this.bodyY = option.rect.y;
+    // test code
     this.inputs = [
       new Slot({node:this, name:"in-1", type:SLOT_TYPE_INPUT}),
       new Slot({node:this, name:"in-2", type:SLOT_TYPE_INPUT}),
@@ -27,6 +28,7 @@ const Node = class {
       new Slot({node:this, name:"out-2", type:SLOT_TYPE_OUTPUT}),
       new Slot({node:this, name:"out-3", type:SLOT_TYPE_OUTPUT}),
     ];
+    //~
     this.links = [];
     this.clacSlotLayout();
   }

@@ -2,48 +2,73 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <link rel="stylesheet" href="./index.css"></style>
     <script src="./external/gl-matrix.js"></script>
     <script src="./math/vec2.js"></script>
     <script src="./math/rect.js"></script>
     <script src="util.js"></script>
-    <script src="link.js"></script>
     <script src="config.js"></script>
+    <script src="link.js"></script>
+    <script src="context_menu.js"></script>
     <script src="slot.js"></script>
     <script src="node.js"></script>    
     <script src="editview.js"></script>
-    <style>
-      html, body {
-        margin: 0;
-        padding: 0;
-        width:100%;
-        height:100%;
-        background-color: #333;
-      }
-    </style>
   </head>
+
   <body onload="init();">
-    <canvas id="canvas"></canvas>
+    <canvas id="canvas">
+    </canvas>
+
 
     <script type="application/javascript">
-      var canvas = document.getElementById("canvas");
-      canvas.width = window.innerWidth - 4;
-      canvas.height = window.innerHeight - 4;
-      var ctx = canvas.getContext("2d");
+      var _canvas = document.getElementById("canvas");
+      _canvas.width = window.innerWidth - 4;
+      _canvas.height = window.innerHeight - 4;
+      var _ctx = _canvas.getContext("2d");
       var _eview = null;
+      var _menu = null;//new ContextMenu();
 
       function init() {
-        _eview = new EditView(ctx, (option = {width:canvas.width, height:canvas.height}));
+        _eview = new EditView(_ctx, (option = {width:_canvas.width, height:_canvas.height}));
+
+        _menu = new ContextMenu();
+        _menu.addMenu('test1', () => console.log('test1'));
+        _menu.addMenu('test2', () => console.log('test2'));
+        _menu.addMenu('test3', () => console.log('test3'));
+        _menu.open(100, 100);
+
         window.requestAnimationFrame(render);
+
+        // var root = document.createElement('div');
+        // root.style.position = "absolute";
+        // root.style.left = 100 + 'px';
+        // root.style.top = 100 + 'px';
+        // root.style.width = 100 + 'px';
+        // root.style.height = 30 + 'px';
+        // root.innerHTML = 'aaa';
+        // document.body.appendChild(root);
+        // //_canvas.appendChild(root);
+        // // console.log(root);
+
+        // var root2 = document.createElement('div');
+        // root2.style.position = "absolute";
+        // root2.style.left = 103 + 'px';
+        // root2.style.top = 00 + 'px';
+        // root2.style.width = 100 + 'px';
+        // root2.style.height = 30 + 'px';
+        // root2.innerHTML = 'bbb';
+        // root.appendChild(root2);
+
       }
 
       function render() {
-        if (_eview) _eview.render(ctx);
+        if (_eview) _eview.render(_ctx);
         window.requestAnimationFrame(render);
       }
 
       function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        _canvas.width = window.innerWidth;
+        _canvas.height = window.innerHeight;
       }
 
       window.addEventListener("resize", resizeCanvas, false);

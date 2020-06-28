@@ -1,0 +1,30 @@
+
+html, body 
+{
+	margin: 0;
+	padding: 0;
+	width:100%;
+	height:100%;
+	background-color: #333;
+}
+
+div {
+	background-color: #555; 
+	border: true;
+	border-color: #FFF;
+}
+
+.contextmenu-item {
+	display: inline-block;
+	padding-left : 0.5rem;
+	color: #FFF;
+	/* border: 0.05rem solid;
+	border-color: #FFF; */
+	background-color: #444;
+}
+
+.contextmenu-item:hover {
+	/* border: 0.05rem solid;
+	border-color: #FFF; */
+	background-color: #0c47e9;
+}

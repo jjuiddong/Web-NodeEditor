@@ -44,9 +44,15 @@
           }
         });
 
-        canvas.addEventListener("mouseout", (e) => {
+        canvas.addEventListener("mouseleave", (e) => {
           //if (ctx.isPointInPath(_wnd.rect, e.offsetX, e.offsetY)) {
-            console.log("mouse out");
+            console.log("mouse leave");
+          //}
+        });
+
+         canvas.addEventListener("mouseenter", (e) => {
+          //if (ctx.isPointInPath(_wnd.rect, e.offsetX, e.offsetY)) {
+            console.log("mouse enter");
           //}
         });
 

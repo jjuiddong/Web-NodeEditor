@@ -30,9 +30,11 @@ const EditView = class {
     this.editLink = null;
     this.links = [];
 
+    // test code
     var node1 = new Node((option = { rect: new Rect(1110, 1210, 200, 200) }));
     var node2 = new Node((option = { rect: new Rect(1510, 1310, 200, 200) }));
     this.nodes = [node1, node2];
+    //~
 
     canvas.addEventListener("mousemove", this.onMouseMove);
     canvas.addEventListener("mousedown", this.onMouseDown);
