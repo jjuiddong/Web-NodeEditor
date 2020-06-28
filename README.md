@@ -1,5 +1,5 @@
 # Web-NodeEditor
-Node Editor with JavaScript and HTML
+Node Editor with JavaScript 2D Rendering Context and HTML
 
 - Reference Project
   - https://github.com/jagenjo/litegraph.js
