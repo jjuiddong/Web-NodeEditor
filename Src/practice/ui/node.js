@@ -1,38 +1,38 @@
 //
 // 2020-06-24, jjuiddong
-// window class
+// node class
 //
 
-// window state
-const WINDOW_STATE_NORMAL = 0;
-const WINDOW_STATE_HOVER = 1;
-const WINDOW_STATE_SELECT = 2;
-const WINDOW_STATE_EDIT_SLOT = 1;
+// node state
+const NODE_STATE_NORMAL = 0;
+const NODE_STATE_HOVER = 1;
+const NODE_STATE_SELECT = 2;
+const NODE_STATE_EDIT_SLOT = 1;
 
-const Window = class {
+const Node = class {
   constructor(option = {rect:new Rect(0,0,200,200)}) {
     this.id = Util.genId();
-    this.state = WINDOW_STATE_NORMAL;
-    this.title = "Window";
+    this.state = NODE_STATE_NORMAL;
+    this.title = "Node";
     this.offset = new Vec2(0,0);
     this.rect = option.rect;
     this.bodyY = option.rect.y;
     this.inputs = [
-      new Slot({window:this, name:"in-1", type:SLOT_TYPE_INPUT}),
-      new Slot({window:this, name:"in-2", type:SLOT_TYPE_INPUT}),
-      new Slot({window:this, name:"in-3", type:SLOT_TYPE_INPUT}),
+      new Slot({node:this, name:"in-1", type:SLOT_TYPE_INPUT}),
+      new Slot({node:this, name:"in-2", type:SLOT_TYPE_INPUT}),
+      new Slot({node:this, name:"in-3", type:SLOT_TYPE_INPUT}),
     ];
     this.outputs = [
-      new Slot({window:this, name:"out-1", type:SLOT_TYPE_OUTPUT}),
-      new Slot({window:this, name:"out-2", type:SLOT_TYPE_OUTPUT}),
-      new Slot({window:this, name:"out-3", type:SLOT_TYPE_OUTPUT}),
+      new Slot({node:this, name:"out-1", type:SLOT_TYPE_OUTPUT}),
+      new Slot({node:this, name:"out-2", type:SLOT_TYPE_OUTPUT}),
+      new Slot({node:this, name:"out-3", type:SLOT_TYPE_OUTPUT}),
     ];
     this.links = [];
     this.clacSlotLayout();
   }
 
   //--------------------------------------------------------------------------------
-  // render window
+  // render node
   render = function (ctx) {
     var x = this.rect.x;
     var y = this.rect.y;
@@ -43,14 +43,14 @@ const Window = class {
         const hh = Config.TITLEBAR_HEIGHT;
         const by = y + Config.TITLEBAR_HEIGHT;
         const bh = h - Config.TITLEBAR_HEIGHT;
-        roundedRectHeader(ctx, x, y, w, hh, Config.WINDOW_ARC_RADIUS);
-        roundedRectBody(ctx, x, by, w, bh, Config.WINDOW_ARC_RADIUS);
+        roundedRectHeader(ctx, x, y, w, hh, Config.NODE_ARC_RADIUS);
+        roundedRectBody(ctx, x, by, w, bh, Config.NODE_ARC_RADIUS);
         this.bodyY = hh;
     }
 
     {
       // render title text
-      var tx = x + Config.WINDOW_MARGIN_LEFT;
+      var tx = x + Config.NODE_MARGIN_LEFT;
       var ty = y + Config.TITLEBAR_HEIGHT - 5;
       ctx.font = "24px serif";
       ctx.fillStyle = "rgba(0,0,0,1)";
@@ -70,7 +70,7 @@ const Window = class {
   };
 
   //--------------------------------------------------------------------------------
-  // move window x,y position
+  // move node x,y position
   move = function (x, y) {
     this.rect.x = x;
     this.rect.y = y;
@@ -122,25 +122,30 @@ const Window = class {
 
   //--------------------------------------------------------------------------------
   // mouse down event handling
-  // e: event
   onMouseDown = function(mousePos) {
     this.inputs.forEach((element) => element.onMouseDown(mousePos));
     this.outputs.forEach((element) => element.onMouseDown(mousePos));
 
     var slots = this.getSelectSlots();
     if (slots.length > 0) {
-      this.state = WINDOW_STATE_EDIT_SLOT;
+      this.state = NODE_STATE_EDIT_SLOT;
     }
   }
 
   //--------------------------------------------------------------------------------
   // mouse up event handling
-  // e: event
   onMouseUp = function(mousePos) {
     this.inputs.forEach((element) => element.onMouseUp(mousePos));
     this.outputs.forEach((element) => element.onMouseUp(mousePos));
+    this.state = NODE_STATE_NORMAL;
+  }
 
-    this.state = WINDOW_STATE_NORMAL;
+  //--------------------------------------------------------------------------------
+  // double click event handling
+  onMouseDBClick = function(mousePos) {
+    this.inputs.forEach((element) => element.onMouseDBClick(mousePos));
+    this.outputs.forEach((element) => element.onMouseDBClick(mousePos));
+    this.state = NODE_STATE_NORMAL;
   }
 
 };
@@ -180,7 +185,7 @@ function roundedRectHeader(ctx, x, y, width, height, radius) {
   ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
   ctx.fill();
   ctx.restore();
-  ctx.strokeStyle = Config.WINDOW_BORDER_COLOR;
+  ctx.strokeStyle = Config.NODE_BORDER_COLOR;
   ctx.stroke();
 }
 
@@ -203,6 +208,6 @@ function roundedRectBody(ctx, x, y, width, height, radius) {
   ctx.fillStyle = "rgba(255,255,255,1)";
   ctx.fill();
   ctx.restore();
-  ctx.strokeStyle = Config.WINDOW_BORDER_COLOR;
+  ctx.strokeStyle = Config.NODE_BORDER_COLOR;
   ctx.stroke();
 }

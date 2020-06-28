@@ -1,7 +1,6 @@
 
 Web Node Editor Develop History
 
-
 -★ window render
 	-★ render window
 	-★ rectangle
@@ -14,22 +13,29 @@ Web Node Editor Develop History
 	-★ zoom in/out
 	-★ scroll
 -★ input/output slot
-- slot link
+-★ slot link
 	-★ selection
 		-★ slot hilight
-	- drag
-	- bezier line
+	-★ drag
+	-★ bezier line
+	-★ validate
+		-★ check same link
+	-★ remove
+	-★ outline
+- popup menu
+	- add node	
 - button
 	- close button
 	- max button
 	- min button
-- line selection
 - widgets
 	- button
 	- edit
 		- text
 		- float,int
 	- combo box
+- input text
+- group
 - window resize
 - typescript
-- popup menu
+

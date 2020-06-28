@@ -6,12 +6,14 @@
 const Link = class {
   constructor(
     option = {
+      id: null,
       from: 0,
       to: 0,
       p0: new Vec2(0, 0),
       p1: new Vec2(0, 0),
     }
   ) {
+    this.id = option.id || Util.genId();
     this.from = option.from || 0; // from slot id
     this.to = option.to || 0; // to slot id
     this.p0 = option.p0 || new Vec2(0, 0); // from slot position
@@ -28,12 +30,17 @@ const Link = class {
     var cp2x = Util.lerp(cx, this.p1.x, 0.5);
     var cp2y = Util.lerp(cy, this.p1.y, 0.9);
 
-    ctx.strokeStyle = "rgba(255,255,255,1)";
-    ctx.lineWidth = 5;
+    // outline
+    ctx.strokeStyle = "rgba(0,0,0,1)";
+    ctx.lineWidth = 7;
     ctx.beginPath();
     ctx.moveTo(this.p0.x, this.p0.y);
     ctx.quadraticCurveTo(cp1x, cp1y, cx, cy);
     ctx.quadraticCurveTo(cp2x, cp2y, this.p1.x, this.p1.y);
+    ctx.stroke();
+    // inner line
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = "rgba(255,255,255,1)";
     ctx.stroke();
   };
 

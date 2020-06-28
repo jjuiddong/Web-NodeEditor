@@ -16,28 +16,29 @@ const SLOT_STATE_SELECT = 2;
 const Slot = class {
   constructor(
     option = {
-      window: null,
-      id: 0,
+      node: null,
+      id: null,
       name: "slot",
       type: SLOT_TYPE_INPUT,
       rect: new Rect(),
     }
   ) {
     this.state = SLOT_STATE_NORMAL;
-    this.window = option.window;
+    this.node = option.node;
     this.id = option.id || Util.genId();
-    this.name = option.name || 'slot';
+    this.name = option.name || "slot";
     this.type = option.type || SLOT_TYPE_INPUT;
-    this.rect = option.rect || new Rect(0,0,0,0);
+    this.rect = option.rect || new Rect(0, 0, 0, 0);
+    this.hasLink = false;
   }
 
   //--------------------------------------------------------------------------------
   // ctx: 2d rendering context
-  // window: parent window
+  // node: parent node
   render = function (ctx) {
-    const window = this.window;
-    const x = window.rect.x + this.rect.x; 
-    const y = window.rect.y + window.bodyY + this.rect.y; 
+    const node = this.node;
+    const x = node.rect.x + this.rect.x;
+    const y = node.rect.y + node.bodyY + this.rect.y;
     const center = y + Config.SLOT_HEIGHT / 2; // slot center
     const iconR = Config.SLOT_ICON_RADIUS; // icon radius
     const iconW = Config.SLOT_ICON_SPACE_WIDTH;
@@ -48,7 +49,6 @@ const Slot = class {
     if (this.type === SLOT_TYPE_INPUT) {
       cx += Config.SLOT_MARGIN_LEFT;
       cx += iconR;
-
     } else if (this.type === SLOT_TYPE_OUTPUT) {
       cx -= Config.SLOT_MARGIN_LEFT;
       cx -= iconR;
@@ -57,14 +57,23 @@ const Slot = class {
     {
       // render slot icon
       switch (this.state) {
-        case SLOT_STATE_NORMAL: ctx.fillStyle = Config.SLOT_ICON_COLOR_NORMAL; break;
-        case SLOT_STATE_HOVER: ctx.fillStyle = Config.SLOT_ICON_COLOR_HOVER; break;
-        case SLOT_STATE_SELECT: ctx.fillStyle = Config.SLOT_ICON_COLOR_SELECT; break;
+        case SLOT_STATE_NORMAL:
+          ctx.fillStyle = this.hasLink
+            ? Config.SLOT_ICON_COLOR_LINK
+            : Config.SLOT_ICON_COLOR_NORMAL;
+          break;
+        case SLOT_STATE_HOVER:
+          ctx.fillStyle = Config.SLOT_ICON_COLOR_HOVER;
+          break;
+        case SLOT_STATE_SELECT:
+          ctx.fillStyle = Config.SLOT_ICON_COLOR_SELECT;
+          break;
       }
+
       //ctx.fillStyle =  Config.SLOT_ICON_COLOR;
       const sy = center;
       ctx.beginPath();
-      ctx.arc(cx, sy, iconR, 0, Math.PI*2);
+      ctx.arc(cx, sy, iconR, 0, Math.PI * 2);
       ctx.fill();
       ctx.stroke();
     }
@@ -72,9 +81,8 @@ const Slot = class {
     if (this.type === SLOT_TYPE_INPUT) {
       cx += iconR + 5;
       ctx.textAlign = "left";
-
     } else if (this.type === SLOT_TYPE_OUTPUT) {
-      cx -= (iconR + 5);
+      cx -= iconR + 5;
       ctx.textAlign = "right";
     }
 
@@ -89,7 +97,6 @@ const Slot = class {
     }
 
     ctx.textAlign = "left"; // restore
-
   };
 
   //--------------------------------------------------------------------------------
@@ -98,11 +105,17 @@ const Slot = class {
   };
 
   //--------------------------------------------------------------------------------
+  // set hasLink
+  setLink = function(hasLink) {
+    this.hasLink = hasLink;
+  }
+
+  //--------------------------------------------------------------------------------
   // return slot icon positon
   getPos = function () {
-    const window = this.window;
-    const left = window.rect.x + this.rect.x; 
-    const top = window.rect.y + window.bodyY + this.rect.y; 
+    const node = this.node;
+    const left = node.rect.x + this.rect.x;
+    const top = node.rect.y + node.bodyY + this.rect.y;
     const iconR = Config.SLOT_ICON_RADIUS; // icon radius
     var cx = left;
     const center = top + Config.SLOT_HEIGHT / 2; // slot center
@@ -116,21 +129,20 @@ const Slot = class {
     }
 
     return new Vec2(cx, center);
-  }
+  };
 
   //--------------------------------------------------------------------------------
   // is contain point?
   isPointInRect = function (x, y) {
-    const window = this.window;
-    const left = window.rect.x + this.rect.x; 
-    const top = window.rect.y + window.bodyY + this.rect.y; 
+    const node = this.node;
+    const left = node.rect.x + this.rect.x;
+    const top = node.rect.y + node.bodyY + this.rect.y;
     const iconW = Config.SLOT_ICON_SPACE_WIDTH;
     var cx = left;
 
     if (this.type === SLOT_TYPE_INPUT) {
       cx += Config.SLOT_MARGIN_LEFT;
       //cx += iconR;
-
     } else if (this.type === SLOT_TYPE_OUTPUT) {
       cx -= Config.SLOT_MARGIN_LEFT;
       cx -= iconW;
@@ -138,36 +150,40 @@ const Slot = class {
 
     const rect = new Rect(cx, top, iconW, Config.SLOT_HEIGHT);
     return rect.isPointInRect(x, y);
-  }
+  };
 
   //--------------------------------------------------------------------------------
   // mouse move event handling
   // e: event
   onMouseMove = function (mousePos, e) {
     if (this.isPointInRect(mousePos.x, mousePos.y)) {
-      if (this.state !== SLOT_STATE_SELECT)
-        this.state = SLOT_STATE_HOVER;
+      if (this.state !== SLOT_STATE_SELECT) this.state = SLOT_STATE_HOVER;
     } else {
       this.state = SLOT_STATE_NORMAL;
     }
-  }
+  };
 
   //--------------------------------------------------------------------------------
   // mouse down event handling
-  // e: event
   onMouseDown = function (mousePos) {
     if (this.isPointInRect(mousePos.x, mousePos.y)) {
       this.state = SLOT_STATE_SELECT;
     }
-  }
+  };
 
   //--------------------------------------------------------------------------------
   // mouse up event handling
-  // e: event
   onMouseUp = function (mousePos) {
     if (this.isPointInRect(mousePos.x, mousePos.y)) {
       this.state = SLOT_STATE_HOVER;
     }
-  }
+  };
 
+  //--------------------------------------------------------------------------------
+  // double click event handling
+  onMouseDBClick = function (mousePos) {
+    if (this.isPointInRect(mousePos.x, mousePos.y)) {
+      this.state = SLOT_STATE_SELECT;
+    }
+  };
 };
