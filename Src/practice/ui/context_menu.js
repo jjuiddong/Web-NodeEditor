@@ -16,14 +16,15 @@ const MenuItem = class {
       callback: null,
     }
   ) {
-    this.contextMenu = option.contextMenu;
+    this.contextMenu = option.contextMenu; // context menu
     this.isRootMenu =
       option.isRootMenu === undefined ? true : option.isRootMenu;
-    this.parentElem = option.parentElem;
+    this.parentElem = option.parentElem; // DOM parent element
     this.name = option.name || "menu item";
+    this.enable = true; // enable/disable?
     this.callback = option.callback;
-    this.children = [];
-    this.showMenu = false;
+    this.children = []; // child menu item
+    this.showMenu = false; // show/hide menu
 
     if (this.isRootMenu) {
       this.elem = document.body;
@@ -117,6 +118,13 @@ const MenuItem = class {
   };
 
   //--------------------------------------------------------------------------------
+  // set menu enable/disable
+  setEnable = function(enable) {
+    this.enable = enable;
+    this.elem.className = enable? "contextmenu-item" : "contextmenu-item disabled";
+  }
+
+  //--------------------------------------------------------------------------------
   // mouse move event handling
   onMouseMove = (e) => {};
 
@@ -138,6 +146,7 @@ const MenuItem = class {
   // mouse click event handling
   onMouseClick = (e) => {
     e.stopPropagation();
+    if (!this.enable) return;
     if (this.callback) this.callback(this);
 
     // leaf menuItem? close context menu
@@ -196,11 +205,40 @@ const ContextMenu = class {
   // parentMenuName: menuName1&menuName2&menuName3
   //                delimeter: &
   addSubMenu = function (parentMenuName, name, callback) {
+    var menuItem = null;
+    var parentMenuItem = this.findMenuItem(parentMenuName);
+    if (parentMenuItem) {
+      menuItem = parentMenuItem.addSubMenu(
+        (option = {
+          contextMenu: this,
+          isRootMenu: false,
+          name: name,
+          callback: callback,
+        })
+      );
+    } else {
+      console.log('not found parent menu item ' + parentMenuName);
+    }    
 
-    const strs = parentMenuName.split('&');
+    return menuItem;
+  };
+
+  //--------------------------------------------------------------------------------
+  // menu item enable/disable
+  // menuName, ex)menuName1&menuName2&menuName3
+  // enable : boolean
+  setMenuEnable = function(menuName, enable) {
+    var menuItem = this.findMenuItem(menuName);
+    menuItem.setEnable(enable);
+  }
+
+  //--------------------------------------------------------------------------------
+  // menuName, ex)menuName1&menuName2&menuName3
+  findMenuItem = function(menuName) {
+    const strs = menuName.split('&');
     var children = this.rootMenu.children;
     
-    var parentMenuItem = null;
+    var menuItem = null;
     for (var i=0; i < strs.length; ++i) {
       var parent = null;    
       for (var k=0; k < children.length; ++k) {
@@ -212,28 +250,13 @@ const ContextMenu = class {
 
       if (!parent) break; // not found parent menu item
       if (strs.length-1 === i) {
-        parentMenuItem = parent;
+        menuItem = parent;
         break; // success find 
       }
       children = parent.children;
     }
-
-    var menuItem = null;
-    if (parentMenuItem) {
-      menuItem = parentMenuItem.addSubMenu(
-        (option = {
-          contextMenu: this,
-          isRootMenu: false,
-          name: name,
-          callback: callback,
-        })
-      );
-    } else {
-      console.log('not found parent menu item ' + parentMenuItem);
-    }    
-
     return menuItem;
-  };
+  }
 
 
   //--------------------------------------------------------------------------------

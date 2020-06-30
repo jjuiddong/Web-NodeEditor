@@ -12,24 +12,23 @@ const SLOT_STATE_NORMAL = 0;
 const SLOT_STATE_HOVER = 1;
 const SLOT_STATE_SELECT = 2;
 
-// slot type
 const Slot = class {
   constructor(
     option = {
-      node: null,
       id: null,
+      node: null,
       name: "slot",
       type: SLOT_TYPE_INPUT,
       rect: new Rect(),
     }
   ) {
-    this.state = SLOT_STATE_NORMAL;
-    this.node = option.node;
     this.id = option.id || Util.genId();
+    this.node = option.node; // slot owner node
     this.name = option.name || "slot";
     this.type = option.type || SLOT_TYPE_INPUT;
     this.rect = option.rect || new Rect(0, 0, 0, 0);
-    this.hasLink = false;
+    this.hasLink = false; // slot has link?
+    this.state = SLOT_STATE_NORMAL;
   }
 
   //--------------------------------------------------------------------------------
@@ -165,7 +164,7 @@ const Slot = class {
 
   //--------------------------------------------------------------------------------
   // mouse down event handling
-  onMouseDown = function (mousePos) {
+  onMouseDown = function (mousePos, e) {
     if (this.isPointInRect(mousePos.x, mousePos.y)) {
       this.state = SLOT_STATE_SELECT;
     }
@@ -173,15 +172,17 @@ const Slot = class {
 
   //--------------------------------------------------------------------------------
   // mouse up event handling
-  onMouseUp = function (mousePos) {
+  onMouseUp = function (mousePos, e) {
     if (this.isPointInRect(mousePos.x, mousePos.y)) {
       this.state = SLOT_STATE_HOVER;
+    } else {
+      this.state = SLOT_STATE_NORMAL;
     }
   };
 
   //--------------------------------------------------------------------------------
   // double click event handling
-  onMouseDBClick = function (mousePos) {
+  onMouseDBClick = function (mousePos, e) {
     if (this.isPointInRect(mousePos.x, mousePos.y)) {
       this.state = SLOT_STATE_SELECT;
     }

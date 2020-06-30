@@ -30,6 +30,7 @@ const Link = class {
     var cp2x = Util.lerp(cx, this.p1.x, 0.5);
     var cp2y = Util.lerp(cy, this.p1.y, 0.9);
 
+    ctx.save();
     // outline
     ctx.strokeStyle = "rgba(0,0,0,1)";
     ctx.lineWidth = 7;
@@ -42,6 +43,7 @@ const Link = class {
     ctx.lineWidth = 5;
     ctx.strokeStyle = "rgba(255,255,255,1)";
     ctx.stroke();
+    ctx.restore();
   };
 
   //--------------------------------------------------------------------------------

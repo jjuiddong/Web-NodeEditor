@@ -3,55 +3,56 @@
 // Node Editor View class
 //  - render canvas
 //  - render node
+//  - render link
 //
 const EDIT_STATE_NORMAL = 0;
 const EDIT_STATE_SCROLL = 1;
 const EDIT_STATE_MOVE_NODE = 2;
 const EDIT_STATE_EDIT_LINK = 3;
+const EDIT_STATE_EDIT_WIDGET = 4;
 
 const EditView = class {
   constructor(ctx, option = { width: 800, height: 600 }) {
     this.state = EDIT_STATE_NORMAL;
-    this.ctx = ctx;
-    this.width = option.width;
-    this.height = option.height;
-    this.offset = new Vec2(1000, 1000); // canvas offset
+    this.ctx = ctx; // rendering context 2d
+    this.isFocus = false; // focus?
+    this.width = option.width; // view width
+    this.height = option.height; // view height
+    this.offset = new Vec2(1000, 1000); // canvas scroll offset
+    this.scale = 1; // canvas scaling
     this.size = new Vec2(2000, 2000); // total editor canvas size
-    this.isScroll = false; // mouse click scroll
-    this.clickPos = new Vec2(0, 0);
-    this.prevPos = new Vec2(0, 0);
-    this.pattern;
-    this.img = new Image();
+    this.isScroll = false; // mouse click scroll?
+    this.clickPos = new Vec2(0, 0); // click pos, view space position
+    this.prevPos = new Vec2(0, 0); // previous pos, view space position
+    this.mousePos = new Vec2(0, 0); // click pos, canvas space position
+    this.pattern; // background image pattern
+    this.img = new Image(); // background image
     this.img.onload = () => {
       this.pattern = ctx.createPattern(this.img, "repeat");
     };
     this.img.src = "imgs/grid.png";
-    this.scale = 1;
-    this.editLink = null;
-    this.links = [];
+    this.editLink = null; // current edit link
+    this.editWidget = null; // current edit widget
+    this.links = []; // all link
+    this.nodes = []; // all node
+    this.menu = null; // context menu
 
     var menu = new ContextMenu();
-    menu.addMenu('Add');
-    menu.addMenu('Remove');
-    menu.addMenu('Group');    
-    menu.addSubMenu('Add', "Node1");
-    menu.addSubMenu('Add', "Node2");
-    menu.addSubMenu('Add', "Node3");
-    menu.addSubMenu('Add', "Node4");
+    menu.addMenu("Add");
+    menu.addMenu("Remove", this.onRemove);
+    menu.addMenu("Group", () => console.log("Group"));
+    menu.addSubMenu("Add", "Variable");
+    menu.addSubMenu("Add", "Function");
+    menu.addSubMenu("Add&Variable", "Boolean", () => this.nodes.push(SpawnNode.Boolean(this.mousePos)));
+    menu.addSubMenu("Add&Variable", "Number", () => this.nodes.push(SpawnNode.Number(this.mousePos)));
+    menu.addSubMenu("Add&Variable", "String", () => this.nodes.push(SpawnNode.String(this.mousePos)));
 
-    // menu.addMenu('test2', () => console.log('test2'));
-    // menu.addMenu('test3', () => console.log('test3'));
-    // menu.addSubMenu('test3', 'sub1', () => console.log('sub1'));
-    // menu.addSubMenu('test3', 'sub2', () => console.log('sub2'));
-    // menu.addSubMenu('test3', 'sub3', () => console.log('sub3'));
-    // menu.addSubMenu('test3&sub3', 'sub3-1', () => console.log('sub3-1'));
+    menu.addSubMenu("Add&Function", "Node1", () => this.nodes.push(SpawnNode.Node1(this.mousePos)));
+    menu.addSubMenu("Add&Function", "Node2", () => this.nodes.push(SpawnNode.Node2(this.mousePos)));
+    menu.addSubMenu("Add&Function", "Node3", () => this.nodes.push(SpawnNode.Node3(this.mousePos)));
+    menu.addSubMenu("Add&Function", "Node4");
+    menu.addSubMenu("Add&Function", "Console", () => this.nodes.push(SpawnNode.Console(this.mousePos)));
     this.menu = menu;
-
-    // test code
-    var node1 = new Node((option = { rect: new Rect(1110, 1210, 200, 200) }));
-    var node2 = new Node((option = { rect: new Rect(1510, 1310, 200, 200) }));
-    this.nodes = [node1, node2];
-    //~    
 
     canvas.addEventListener("mousemove", this.onMouseMove);
     canvas.addEventListener("mousedown", this.onMouseDown);
@@ -80,10 +81,11 @@ const EditView = class {
       );
       ctx.imageSmoothingEnabled = true;
     }
+
+    // render link    
+    this.links.forEach((link) => link.render(ctx));
     // render nodes
     this.nodes.forEach((node) => node.render(ctx));
-
-    this.links.forEach((elements) => elements.render(ctx));
     if (this.editLink) this.editLink.render(ctx);
 
     ctx.restore();
@@ -182,6 +184,50 @@ const EditView = class {
   };
 
   //--------------------------------------------------------------------------------
+  // Remove Links
+  // rmLinks: array link
+  removeLinks = function (rmLinks) {
+    // remove link
+    this.links = this.links.filter(
+      (link) => !rmLinks.find((r) => r.id === link.id)
+    );
+
+    // refresh slot state
+    rmLinks.forEach((link) => {
+      var frSlot = this.getSlot(link.from);
+      var toSlot = this.getSlot(link.to);
+      if (frSlot) {
+        frSlot.setLink(this.getLinkFromSlot(frSlot.id).length !== 0);
+      }
+      if (toSlot) {
+        toSlot.setLink(this.getLinkFromSlot(toSlot.id).length !== 0);
+      }
+    });
+  };
+
+  //--------------------------------------------------------------------------------
+  // Context Menu Remove
+  // remove select nodes
+  onRemove = () => {
+    // collect remove link
+    var rmLinks = [];
+    for (var node of this.nodes) {
+      if (node.isFocus) {
+        for (var slot of node.inputs) {
+          rmLinks = rmLinks.concat(this.getLinkFromSlot(slot.id));
+        }
+        for (var slot of node.outputs) {
+          rmLinks = rmLinks.concat(this.getLinkFromSlot(slot.id));
+        }
+      }
+    }
+    this.removeLinks(rmLinks);
+
+    // remove node
+    this.nodes = this.nodes.filter((node) => !node.isFocus);
+  };
+
+  //--------------------------------------------------------------------------------
   // mouse move event handling
   onMouseMove = (e) => {
     if (this.isScroll) {
@@ -194,22 +240,27 @@ const EditView = class {
 
     const mousePos = this.getOriginalPos(e.offsetX, e.offsetY);
     var selNode = null;
+
     this.nodes.forEach((node) => {
-      if (node.state !== NODE_STATE_SELECT) {
-        if (node.isPointInRect(mousePos.x, mousePos.y))
-          node.onMouseMove(mousePos, e);
-      } else if (node.state === NODE_STATE_SELECT) {
+      if (node.state === NODE_STATE_SELECT) {
         selNode = node;
         node.move(mousePos.x + node.offset.x, mousePos.y + node.offset.y);
+        if (this.state === EDIT_STATE_MOVE_NODE)
+          this.calcNodeLayout(selNode);
+      } if (node.state === NODE_STATE_EDIT_WIDGET) {
+         // nothing~
+      } else {
+        if (node.isPointInRect(mousePos.x, mousePos.y))
+          node.onMouseMove(mousePos, e);
       }
     });
 
     if (this.editLink && this.state === EDIT_STATE_EDIT_LINK) {
       this.editLink.setP1(mousePos);
     }
-    if (selNode && this.state === EDIT_STATE_MOVE_NODE) {
-      this.calcNodeLayout(selNode);
-    }
+    if (this.editWidget && this.state === EDIT_STATE_EDIT_WIDGET) {
+      this.editWidget.onMouseMove(mousePos, e);
+    }    
   };
 
   //--------------------------------------------------------------------------------
@@ -217,7 +268,7 @@ const EditView = class {
   onMouseDown = (e) => {
     if (e.button === 0) {
       this.onMouseLeftDown(e);
-    } 
+    }
   };
 
   //--------------------------------------------------------------------------------
@@ -228,18 +279,24 @@ const EditView = class {
     const mousePos = this.getOriginalPos(e.offsetX, e.offsetY);
 
     var selSlot = null;
+    var selWidget = null;
     this.nodes.forEach((node) => {
       if (node.isPointInRect(mousePos.x, mousePos.y)) {
         isSelect = true;
-        node.onMouseDown(mousePos);
+        node.onMouseDown(mousePos, e);
         if (node.state === NODE_STATE_EDIT_SLOT) {
           this.state = EDIT_STATE_EDIT_LINK;
           selSlot = node.getSelectSlots()[0];
+        } else if (node.state === NODE_STATE_EDIT_WIDGET) {
+          this.state = EDIT_STATE_EDIT_WIDGET;
+          selWidget = node.getSelectWidgets()[0];
         } else {
           this.state = EDIT_STATE_MOVE_NODE;
-          node.state = NODE_STATE_SELECT;
+          node.setFocus(true);
           node.offset.set2(node.rect.x - mousePos.x, node.rect.y - mousePos.y);
         }
+      } else {
+        node.isFocus = false;
       }
     });
 
@@ -261,7 +318,13 @@ const EditView = class {
         })
       );
     }
-  }  
+
+    // eidt widget
+    if (selWidget && this.state === EDIT_STATE_EDIT_WIDGET) {
+      this.editWidget = selWidget;
+    }
+
+  };
 
   //--------------------------------------------------------------------------------
   // mouse up event handling
@@ -271,12 +334,17 @@ const EditView = class {
     } else if (e.button === 2) {
       // mouse right button down
       const mousePos = this.getOriginalPos(e.offsetX, e.offsetY);
-      this.menu.open(e.offsetX, e.offsetY);
+      this.mousePos.set(mousePos);
+
+      // check focus node
+      const nodes = this.nodes.filter((node) => node.isFocus);
+      this.menu.setMenuEnable("Remove", nodes.length > 0);
+
+      this.menu.open(e.offsetX + 5, e.offsetY + 5);
       e.preventDefault();
       e.stopPropagation();
       return false;
     }
-    return false;
   };
 
   //--------------------------------------------------------------------------------
@@ -286,9 +354,10 @@ const EditView = class {
     const mousePos = this.getOriginalPos(e.offsetX, e.offsetY);
     var selSlot = null;
     this.nodes.forEach((node) => {
-      node.state = NODE_STATE_NORMAL;
-      if (node.isPointInRect(mousePos.x, mousePos.y)) {
-        node.onMouseUp(mousePos);
+      if (node.state !== NODE_STATE_NORMAL) {
+        node.onMouseUp(mousePos, e);
+      } else if (node.isPointInRect(mousePos.x, mousePos.y)) {
+        node.onMouseUp(mousePos, e);
 
         const slots = node.getHoverSlots();
         if (slots.length > 0) {
@@ -328,8 +397,8 @@ const EditView = class {
       } else {
         // valid link
         // exchange from=input, to=output
-        const input = (frSlot.type === SLOT_TYPE_INPUT)? frSlot : toSlot;
-        const output = (toSlot.type === SLOT_TYPE_OUTPUT)? toSlot : frSlot;
+        const input = frSlot.type === SLOT_TYPE_INPUT ? frSlot : toSlot;
+        const output = toSlot.type === SLOT_TYPE_OUTPUT ? toSlot : frSlot;
         this.editLink.setFrom(input.id);
         this.editLink.setP0(input.getPos());
         this.editLink.setTo(output.id);
@@ -342,8 +411,9 @@ const EditView = class {
     }
 
     this.editLink = null;
+    this.editWidget = null;
     this.state = EDIT_STATE_NORMAL;
-  }
+  };
 
   //--------------------------------------------------------------------------------
   // mouse up event handling
@@ -352,9 +422,8 @@ const EditView = class {
 
     var selSlot = null;
     this.nodes.forEach((node) => {
-      node.state = NODE_STATE_NORMAL;
       if (node.isPointInRect(mousePos.x, mousePos.y)) {
-        node.onMouseDBClick(mousePos);
+        node.onMouseDBClick(mousePos, e);
 
         const slots = node.getSelectSlots();
         if (slots.length > 0) {
@@ -366,21 +435,7 @@ const EditView = class {
     // remove select slot link
     if (selSlot) {
       var rmLinks = this.getLinkFromSlot(selSlot.id);
-      this.links = this.links.filter(
-        (link) => !rmLinks.find((r) => r.id === link.id)
-      );
-
-      // refresh slot state
-      rmLinks.forEach((link) => {
-        var frSlot = this.getSlot(link.from);
-        var toSlot = this.getSlot(link.to);
-        if (frSlot) {
-          frSlot.setLink(this.getLinkFromSlot(frSlot.id).length !== 0);
-        }
-        if (toSlot) {
-          toSlot.setLink(this.getLinkFromSlot(toSlot.id).length !== 0);
-        }
-      });
+      this.removeLinks(rmLinks);
     }
   };
 

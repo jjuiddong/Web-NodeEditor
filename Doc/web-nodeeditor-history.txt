@@ -26,20 +26,33 @@ Web Node Editor Develop History
 	-★ add node
 	-★ close node
 	-★ submenuitem hierarchy
-- add node
-- remove node
+-★ add node
+-★ remove node
+	-★ remove link
+-★ node focus color
+- widgets
+	- variable
+		- num
+			- input event, drag
+		- bool
+		- string
+	- button
+	- combo box
+	- slider
+	- toggle, checkbox
+- input window
+	- input value(boolean, text, number)
+- info window
+	- edit variable name
+	- edit variable value
+- node auto sizing
+	- by slot count
 - button
 	- close button
 	- max button
 	- min button
-- widgets
-	- button
-	- edit
-		- text
-		- float,int
-	- combo box
 - input text
 - group
 - window resize
 - typescript
-
+- link animation
