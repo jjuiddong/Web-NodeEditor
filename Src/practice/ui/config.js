@@ -22,3 +22,5 @@ Config.SLOT_ICON_COLOR_LINK = "rgba(255,0,0,1)";
 Config.SLOT_ICON_RADIUS = 20 / 2;
 Config.SLOT_ICON_SPACE_WIDTH = Config.SLOT_ICON_RADIUS * 2 + 5;
 Config.SLOT_TEXT_BASE_OFFSET = 5; // text y base offset
+
+Config.CONTEXTMENU_ITEM_HEIGHT = 26;

@@ -30,11 +30,28 @@ const EditView = class {
     this.editLink = null;
     this.links = [];
 
+    var menu = new ContextMenu();
+    menu.addMenu('Add');
+    menu.addMenu('Remove');
+    menu.addMenu('Group');    
+    menu.addSubMenu('Add', "Node1");
+    menu.addSubMenu('Add', "Node2");
+    menu.addSubMenu('Add', "Node3");
+    menu.addSubMenu('Add', "Node4");
+
+    // menu.addMenu('test2', () => console.log('test2'));
+    // menu.addMenu('test3', () => console.log('test3'));
+    // menu.addSubMenu('test3', 'sub1', () => console.log('sub1'));
+    // menu.addSubMenu('test3', 'sub2', () => console.log('sub2'));
+    // menu.addSubMenu('test3', 'sub3', () => console.log('sub3'));
+    // menu.addSubMenu('test3&sub3', 'sub3-1', () => console.log('sub3-1'));
+    this.menu = menu;
+
     // test code
     var node1 = new Node((option = { rect: new Rect(1110, 1210, 200, 200) }));
     var node2 = new Node((option = { rect: new Rect(1510, 1310, 200, 200) }));
     this.nodes = [node1, node2];
-    //~
+    //~    
 
     canvas.addEventListener("mousemove", this.onMouseMove);
     canvas.addEventListener("mousedown", this.onMouseDown);
@@ -198,6 +215,15 @@ const EditView = class {
   //--------------------------------------------------------------------------------
   // mouse down event handling
   onMouseDown = (e) => {
+    if (e.button === 0) {
+      this.onMouseLeftDown(e);
+    } 
+  };
+
+  //--------------------------------------------------------------------------------
+  // mouse left button down event handling
+  onMouseLeftDown = (e) => {
+    this.menu.close();
     var isSelect = false;
     const mousePos = this.getOriginalPos(e.offsetX, e.offsetY);
 
@@ -235,13 +261,28 @@ const EditView = class {
         })
       );
     }
-  };
+  }  
 
   //--------------------------------------------------------------------------------
   // mouse up event handling
   onMouseUp = (e) => {
-    this.isScroll = false;
+    if (e.button === 0) {
+      this.onMouseLeftUp(e);
+    } else if (e.button === 2) {
+      // mouse right button down
+      const mousePos = this.getOriginalPos(e.offsetX, e.offsetY);
+      this.menu.open(e.offsetX, e.offsetY);
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+    return false;
+  };
 
+  //--------------------------------------------------------------------------------
+  // mouse left up event handling
+  onMouseLeftUp = (e) => {
+    this.isScroll = false;
     const mousePos = this.getOriginalPos(e.offsetX, e.offsetY);
     var selSlot = null;
     this.nodes.forEach((node) => {
@@ -302,7 +343,7 @@ const EditView = class {
 
     this.editLink = null;
     this.state = EDIT_STATE_NORMAL;
-  };
+  }
 
   //--------------------------------------------------------------------------------
   // mouse up event handling

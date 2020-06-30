@@ -22,8 +22,12 @@ Web Node Editor Develop History
 		-★ check same link
 	-★ remove
 	-★ outline
-- popup menu
-	- add node
+-★ popup menu
+	-★ add node
+	-★ close node
+	-★ submenuitem hierarchy
+- add node
+- remove node
 - button
 	- close button
 	- max button
