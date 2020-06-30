@@ -9,5 +9,5 @@ Node Editor with JavaScript CanvasRenderingContext2D and HTML
 - Develop History (ScreenShot)
   - https://github.com/jjuiddong/Web-NodeEditor/wiki
 - Recent ScreenShot
-  - <img src="https://github.com/jjuiddong/Web-NodeEditor/blob/master/Doc/link.jpg?raw=true" width="500px"/>
+  - <img src="https://github.com/jjuiddong/Web-NodeEditor/blob/master/Doc/link-edit.jpg?raw=true" width="500px"/>
   
