@@ -30,24 +30,22 @@ Web Node Editor Develop History
 -★ remove node
 	-★ remove link
 -★ node focus color
-- widgets
+-★ widgets
 	-★ variable
 		-★ num
 			-★ input event, drag
 		-★ bool
 		-★ string
-	- button
-	- combo box
-	- slider
-	- toggle, checkbox
 -★ input window
 	-★ input value(boolean, text, number)
-- node save/load
-	- format
-		- node, link, pos, size
-	- mysql
-	- mongodb
-	- local
+-★ node save/load
+	-★ format
+		-★ node, link, pos, size
+	-★ local
+- backend server
+	- node.js
+	- save/load node information
+		- mongodb
 - console window
 - interpreter
 	- generate intermediate code
@@ -67,3 +65,10 @@ Web Node Editor Develop History
 - window resize
 - typescript
 - link animation
+- widgets
+	- button
+	- combo box
+	- slider
+	- toggle, checkbox
+- node save/load
+	- mysql
