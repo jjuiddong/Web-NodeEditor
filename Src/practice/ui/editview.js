@@ -44,15 +44,29 @@ const EditView = class {
     menu.addMenu("Group", () => console.log("Group"));
     menu.addSubMenu("Add", "Variable");
     menu.addSubMenu("Add", "Function");
-    menu.addSubMenu("Add&Variable", "Boolean", () => this.nodes.push(SpawnNode.Boolean(this.mousePos)));
-    menu.addSubMenu("Add&Variable", "Number", () => this.nodes.push(SpawnNode.Number(this.mousePos)));
-    menu.addSubMenu("Add&Variable", "String", () => this.nodes.push(SpawnNode.String(this.mousePos)));
+    menu.addSubMenu("Add&Variable", "Boolean", () =>
+      this.nodes.push(SpawnNode.Boolean(this.mousePos))
+    );
+    menu.addSubMenu("Add&Variable", "Number", () =>
+      this.nodes.push(SpawnNode.Number(this.mousePos))
+    );
+    menu.addSubMenu("Add&Variable", "String", () =>
+      this.nodes.push(SpawnNode.String(this.mousePos))
+    );
 
-    menu.addSubMenu("Add&Function", "Node1", () => this.nodes.push(SpawnNode.Node1(this.mousePos)));
-    menu.addSubMenu("Add&Function", "Node2", () => this.nodes.push(SpawnNode.Node2(this.mousePos)));
-    menu.addSubMenu("Add&Function", "Node3", () => this.nodes.push(SpawnNode.Node3(this.mousePos)));
+    menu.addSubMenu("Add&Function", "Node1", () =>
+      this.nodes.push(SpawnNode.Node1(this.mousePos))
+    );
+    menu.addSubMenu("Add&Function", "Node2", () =>
+      this.nodes.push(SpawnNode.Node2(this.mousePos))
+    );
+    menu.addSubMenu("Add&Function", "Node3", () =>
+      this.nodes.push(SpawnNode.Node3(this.mousePos))
+    );
     menu.addSubMenu("Add&Function", "Node4");
-    menu.addSubMenu("Add&Function", "Console", () => this.nodes.push(SpawnNode.Console(this.mousePos)));
+    menu.addSubMenu("Add&Function", "Console", () =>
+      this.nodes.push(SpawnNode.Console(this.mousePos))
+    );
     this.menu = menu;
 
     canvas.addEventListener("mousemove", this.onMouseMove);
@@ -83,7 +97,7 @@ const EditView = class {
       ctx.imageSmoothingEnabled = true;
     }
 
-    // render link    
+    // render link
     this.links.forEach((link) => link.render(ctx));
     // render nodes
     this.nodes.forEach((node) => node.render(ctx));
@@ -97,12 +111,15 @@ const EditView = class {
       ctx.font = "20px serif";
       ctx.fillStyle = "rgba(255,255,255,1)";
       ctx.fillText(
-        "Scroll : " + this.offset.x.toFixed(2) + ", " + this.offset.y.toFixed(2),
+        "Scroll : " +
+          this.offset.x.toFixed(2) +
+          ", " +
+          this.offset.y.toFixed(2),
         0,
-        ty += 24
+        (ty += 24)
       );
-      ctx.fillText("Zoom : " + this.scale.toFixed(2), 0, ty += 24);
-      ctx.fillText("State : " + this.state, 0, ty += 24);
+      ctx.fillText("Zoom : " + this.scale.toFixed(2), 0, (ty += 24));
+      ctx.fillText("State : " + this.state, 0, (ty += 24));
     }
   };
 
@@ -152,6 +169,51 @@ const EditView = class {
     );
     return links;
   };
+
+  //--------------------------------------------------------------------------------
+  // add link
+  // link: Link instance
+  addLink = function(newLink) {
+    //this.editLink.setTo(selSlot.id);
+    //this.editLink.setP1(selSlot.getPos());
+    const frSlot = this.getSlot(newLink.from);
+    const toSlot = this.getSlot(newLink.to);
+    const frNode = this.getNodeFromSlot(newLink.from);
+    const toNode = this.getNodeFromSlot(newLink.to);
+
+    const existLink = this.links.find(
+      (link) =>
+        (link.from === newLink.from && link.to === newLink.to) ||
+        (link.to === newLink.from && link.from === newLink.to)
+    );
+
+    // check valid link?
+    if (
+      !newLink.to ||
+      !newLink.from ||
+      newLink.to === newLink.from ||
+      frNode === toNode ||
+      existLink ||
+      !frSlot ||
+      !toSlot ||
+      (frSlot && toSlot && frSlot.type === toSlot.type)
+    ) {
+      // invalid link, ignore
+    } else {
+      // valid link
+      // exchange from=input, to=output
+      const input = frSlot.type === SLOT_TYPE_INPUT ? frSlot : toSlot;
+      const output = toSlot.type === SLOT_TYPE_OUTPUT ? toSlot : frSlot;
+      newLink.setFrom(input.id);
+      newLink.setP0(input.getPos());
+      newLink.setTo(output.id);
+      newLink.setP1(output.getPos());
+
+      frSlot.setLink(true);
+      toSlot.setLink(true);
+      this.links.push(newLink);
+    }
+  }
 
   //--------------------------------------------------------------------------------
   // recalc link from,to position
@@ -210,16 +272,27 @@ const EditView = class {
   };
 
   //--------------------------------------------------------------------------------
-  // save
-  save = function() {
-
+  // close document
+  // remove node, link, etc
+  closeDocument = function () {
+    this.nodes = [];
+    this.links = [];
+    this.editLink = null;
+    this.editWidget = null;
+    this.input.close();
   }
 
   //--------------------------------------------------------------------------------
-  // load
-  load = function() {
+  // save node data
+  save = function () {
+    EditView_Ver1.save(this);
+  };
 
-  }
+  //--------------------------------------------------------------------------------
+  // load node data
+  load = function () {
+    EditView_Ver1.load(this);
+  };
 
   //--------------------------------------------------------------------------------
   // Context Menu Remove
@@ -261,10 +334,10 @@ const EditView = class {
       if (node.state === NODE_STATE_SELECT) {
         selNode = node;
         node.move(mousePos.x + node.offset.x, mousePos.y + node.offset.y);
-        if (this.state === EDIT_STATE_MOVE_NODE)
-          this.calcNodeLayout(selNode);
-      } if (node.state === NODE_STATE_EDIT_WIDGET) {
-         // nothing~
+        if (this.state === EDIT_STATE_MOVE_NODE) this.calcNodeLayout(selNode);
+      }
+      if (node.state === NODE_STATE_EDIT_WIDGET) {
+        // nothing~
       } else {
         if (node.isPointInRect(mousePos.x, mousePos.y))
           node.onMouseMove(mousePos, e);
@@ -276,7 +349,7 @@ const EditView = class {
     }
     if (this.editWidget && this.state === EDIT_STATE_EDIT_WIDGET) {
       this.editWidget.onMouseMove(mousePos, e);
-    }    
+    }
   };
 
   //--------------------------------------------------------------------------------
@@ -305,7 +378,7 @@ const EditView = class {
           selSlot = node.getSelectSlots()[0];
         } else if (node.state === NODE_STATE_EDIT_WIDGET) {
           this.state = EDIT_STATE_EDIT_WIDGET;
-          selWidget = node.getSelectWidgets()[0];          
+          selWidget = node.getSelectWidgets()[0];
         } else {
           this.state = EDIT_STATE_MOVE_NODE;
           node.setFocus(true);
@@ -339,7 +412,6 @@ const EditView = class {
     if (selWidget && this.state === EDIT_STATE_EDIT_WIDGET) {
       this.editWidget = selWidget;
     }
-
   };
 
   //--------------------------------------------------------------------------------
@@ -394,45 +466,7 @@ const EditView = class {
     // create link?
     if (this.editLink && selSlot && this.state === EDIT_STATE_EDIT_LINK) {
       this.editLink.setTo(selSlot.id);
-      this.editLink.setP1(selSlot.getPos());
-
-      const frSlot = this.getSlot(this.editLink.from);
-      const toSlot = this.getSlot(this.editLink.to);
-      const frNode = this.getNodeFromSlot(this.editLink.from);
-      const toNode = this.getNodeFromSlot(this.editLink.to);
-
-      const existLink = this.links.find(
-        (link) =>
-          (link.from === this.editLink.from && link.to === this.editLink.to) ||
-          (link.to === this.editLink.from && link.from === this.editLink.to)
-      );
-
-      // check valid link?
-      if (
-        !this.editLink.to ||
-        !this.editLink.from ||
-        this.editLink.to === this.editLink.from ||
-        frNode === toNode ||
-        existLink ||
-        !frSlot ||
-        !toSlot ||
-        (frSlot && toSlot && frSlot.type === toSlot.type)
-      ) {
-        // invalid link, ignore
-      } else {
-        // valid link
-        // exchange from=input, to=output
-        const input = frSlot.type === SLOT_TYPE_INPUT ? frSlot : toSlot;
-        const output = toSlot.type === SLOT_TYPE_OUTPUT ? toSlot : frSlot;
-        this.editLink.setFrom(input.id);
-        this.editLink.setP0(input.getPos());
-        this.editLink.setTo(output.id);
-        this.editLink.setP1(output.getPos());
-
-        frSlot.setLink(true);
-        toSlot.setLink(true);
-        this.links.push(this.editLink);
-      }
+      this.addLink(this.editLink);
     }
 
     // eidt widget?
@@ -440,7 +474,7 @@ const EditView = class {
       if (!(selWidget instanceof Widgets.Boolean)) {
         this.input.open(this.editWidget, e.offsetX, e.offsetY);
       }
-    }    
+    }
 
     this.editLink = null;
     this.editWidget = null;

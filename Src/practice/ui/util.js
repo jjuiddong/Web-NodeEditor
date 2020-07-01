@@ -17,6 +17,13 @@ Util.genId = function() {
 }
 
 //--------------------------------------------------------------------------------
+// initialize id seed
+Util.setSeed = function(seed) {
+  Util.seed = seed;
+  Util.inc = seed;
+}
+
+//--------------------------------------------------------------------------------
 Util.lerp = function (value1, value2, amount) {
   amount = amount < 0 ? 0 : amount;
   amount = amount > 1 ? 1 : amount;
@@ -101,3 +108,33 @@ Util.roundedRectBody = function(ctx, x, y, width, height, radius,
   ctx.strokeStyle = strokeStyle;
   ctx.stroke();
 }
+
+//--------------------------------------------------------------------------------
+// check avilable storage
+// https://developer.mozilla.org/ko/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API
+// ex) Util.storageAvailable('localStorage')
+Util.storageAvailable = function(type) {
+  var storage;
+  try {
+      storage = window[type];
+      var x = '__storage_test__';
+      storage.setItem(x, x);
+      storage.removeItem(x);
+      return true;
+  }
+  catch(e) {
+      return e instanceof DOMException && (
+          // Firefox를 제외한 모든 브라우저
+          e.code === 22 ||
+          // Firefox
+          e.code === 1014 ||
+          // 코드가 존재하지 않을 수도 있기 떄문에 이름 필드도 확인합니다.
+          // Firefox를 제외한 모든 브라우저
+          e.name === 'QuotaExceededError' ||
+          // Firefox
+          e.name === 'NS_ERROR_DOM_QUOTA_REACHED') &&
+          // 이미 저장된 것이있는 경우에만 QuotaExceededError를 확인하십시오.
+          (storage && storage.length !== 0);
+  }
+}
+

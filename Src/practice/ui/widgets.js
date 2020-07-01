@@ -11,6 +11,10 @@ const WIDGET_STATE_NORMAL = 0;
 const WIDGET_STATE_HOVER = 1;
 const WIDGET_STATE_SELECT = 2;
 
+const WIDGET_TYPE_BOOLEAN = 0;
+const WIDGET_TYPE_NUMBER = 1;
+const WIDGET_TYPE_STRING = 2;
+
 const Widgets = class {};
 
 //--------------------------------------------------------------------------------
@@ -19,14 +23,16 @@ const Widgets = class {};
 Widgets.Number = class {
   constructor(
     option = {
+      id: null,
       node: null,
       name: "number",
       value: 0,
       rect: new Rect(),
     }
   ) {
-    this.id = Util.genId();
+    this.id = option.id || Util.genId();
     this.node = option.node; // owner node
+    this.type = WIDGET_TYPE_NUMBER; // number type
     this.value = option.value || 0; // number value
     this.rect = option.rect || new Rect(0, 0, 100, Config.WIDGETS_HEIGHT);
     this.prevPos = new Vec2(0,0);
@@ -132,6 +138,7 @@ Widgets.Boolean = class {
   ) {
     this.id = Util.genId();
     this.node = option.node; // owner node
+    this.type = WIDGET_TYPE_BOOLEAN; // boolean type
     this.value = option.value || false; // boolean value
     this.rect = option.rect || new Rect(0, 0, 100, Config.WIDGETS_HEIGHT);
     this.prevPos = new Vec2(0,0);
@@ -228,6 +235,7 @@ Widgets.String = class {
   ) {
     this.id = Util.genId();
     this.node = option.node; // owner node
+    this.type = WIDGET_TYPE_STRING; // string type
     this.value = option.value || "empty"; // string value
     this.rect = option.rect || new Rect(0, 0, 100, Config.WIDGETS_HEIGHT);
     this.prevPos = new Vec2(0,0);
