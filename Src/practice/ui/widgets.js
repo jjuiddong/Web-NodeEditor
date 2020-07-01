@@ -79,12 +79,11 @@ Widgets.Number = class {
   // e: event
   onMouseMove = function (mousePos, e) {
     if (this.state === WIDGET_STATE_SELECT) {
-
-      const curPos = new Vec2(e.offsetX, e.offsetY);
-      const delta = new Vec2(0,0);
-      Vec2.sub(delta, curPos, this.prevPos);
-      this.prevPos.set(curPos);
-      this.value += delta.x;
+      // const curPos = new Vec2(e.offsetX, e.offsetY);
+      // const delta = new Vec2(0,0);
+      // Vec2.sub(delta, curPos, this.prevPos);
+      // this.prevPos.set(curPos);
+      // this.value += delta.x;
     }
   };
 

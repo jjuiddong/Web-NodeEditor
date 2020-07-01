@@ -35,3 +35,5 @@ Config.WIDGETS_TEXT_COLOR = 'rgba(255,255,255,1)';
 Config.WIDGETS_TEXT_BASE_OFFSET = 5; // text y base offset
 
 Config.CONTEXTMENU_ITEM_HEIGHT = 26;
+
+//Config.POPUP_INPUT_HEIGHT = 50;

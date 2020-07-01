@@ -24,7 +24,7 @@ const MenuItem = class {
     this.enable = true; // enable/disable?
     this.callback = option.callback;
     this.children = []; // child menu item
-    this.showMenu = false; // show/hide menu
+    this.isShowMenu = false; // show/hide menu
 
     if (this.isRootMenu) {
       this.elem = document.body;
@@ -42,14 +42,14 @@ const MenuItem = class {
   // open context menu
   open = function (x, y) {
     if (this.isRootMenu) {
-      this.showMenu = true;
+      this.isShowMenu = true;
       for (var i = 0; i < this.children.length; ++i) {
         const itemX = x;
         const itemY = y + i * Config.CONTEXTMENU_ITEM_HEIGHT;
         this.children[i].open(itemX, itemY);
       }
     } else {
-      this.showMenu = true;
+      this.isShowMenu = true;
       this.elem.style.left = parseInt(x) + "px";
       this.elem.style.top = parseInt(y) + "px";
       this.elem.style.width = 100 + "px";
@@ -82,9 +82,9 @@ const MenuItem = class {
   // close context menu
   close = function () {
     this.children.forEach((element) => element.close());
-    if (!this.isRootMenu && this.showMenu) {
+    if (!this.isRootMenu && this.isShowMenu) {
       this.parentElem.removeChild(this.elem);
-      this.showMenu = false;
+      this.isShowMenu = false;
     }
   };
 

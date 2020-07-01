@@ -10,16 +10,18 @@
     <script src="config.js"></script>
     <script src="link.js"></script>
     <script src="context_menu.js"></script>
+    <script src="popup.js"></script>
     <script src="slot.js"></script>
     <script src="widgets.js"></script>
     <script src="node.js"></script>    
     <script src="node_spawn.js"></script>
+    <script src="menubar.js"></script>
     <script src="editview.js"></script>
   </head>
 
   <body onload="init();" oncontextmenu="return false;">
-    <canvas id="canvas">
-    </canvas>
+    <div id="menubar"></div>
+    <canvas id="canvas"></canvas>
 
     <script type="application/javascript">
       var _canvas = document.getElementById("canvas");
@@ -27,10 +29,11 @@
       _canvas.height = window.innerHeight - 4;
       var _ctx = _canvas.getContext("2d");
       var _eview = null;
-      var _menu = null;//new ContextMenu();
+      var _menuBar = null;
 
       function init() {
         _eview = new EditView(_ctx, (option = {width:_canvas.width, height:_canvas.height}));
+        _menuBar = new MenuBar(_eview);
         window.requestAnimationFrame(render);
       }
 

@@ -17,7 +17,7 @@ div {
 .contextmenu-item {
 	display: inline-block;
 	padding-left : 1.0rem;
-	color: #FFF;
+	color: #CCC;
 	/* border: 0.05rem solid;
 	border-color: #FFF; */
 	background-color: #444;
@@ -35,3 +35,75 @@ div {
 	border-color: #FFF; */
 	background-color: #0c47e9;
 }
+
+.popup-input {
+	display: inline-block;
+	margin: 0;
+	padding: 0;
+	padding-left : 1.0rem;
+	width: 450px;
+	height: 3rem;
+	font-size: 2rem;
+	color: #FFF;
+	background-color: #444;
+}
+
+.popup-input input {
+	border: 0;
+	padding: 0;
+	width: 250px;
+	font-size: 2rem;
+	padding-left : 1.0rem;
+	color: #FFF;
+	background-color: #000;
+}
+
+.popup-input button {
+	border: 0;
+	margin: 0;
+	margin-top: 0rem;
+	margin-left: 1rem;
+	padding: 0.1rem;
+	padding-left: 0.5rem;
+	padding-right: 0.5rem;
+	font-size: 2rem;
+	color: #FFF;	
+	background-color: #555;
+}
+
+.popup-input button:hover {
+	background-color: #777;
+}
+
+.menubar {
+	display: inline-block;
+	margin: 0;
+	padding: 0;
+	padding-left : 1rem;
+	width: 98%;
+	height: 1.5rem;
+	font-size: 1rem;
+	color: #FFF;
+	background-color: #444;
+}
+
+.menubar button {
+	border: 0;
+	margin: 0;
+	margin-top: 0rem;
+	margin-left: 0.5rem;
+	padding: 0.1rem;
+	padding-left: 0.5rem;
+	padding-right: 0.5rem;
+	outline:0;
+	font-size: 1rem;
+	color: #FFF;	
+	background-color: #555;
+}
+.menubar button:hover {
+	background-color: #777;
+}
+.menubar button:active {
+	background-color: #333;
+}
+

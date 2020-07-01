@@ -31,17 +31,29 @@ Web Node Editor Develop History
 	-★ remove link
 -★ node focus color
 - widgets
-	- variable
-		- num
-			- input event, drag
-		- bool
-		- string
+	-★ variable
+		-★ num
+			-★ input event, drag
+		-★ bool
+		-★ string
 	- button
 	- combo box
 	- slider
 	- toggle, checkbox
-- input window
-	- input value(boolean, text, number)
+-★ input window
+	-★ input value(boolean, text, number)
+- node save/load
+	- format
+		- node, link, pos, size
+	- mysql
+	- mongodb
+	- local
+- console window
+- interpreter
+	- generate intermediate code
+	- symbol table
+	- virtual machine
+	- debugger
 - info window
 	- edit variable name
 	- edit variable value
@@ -51,7 +63,6 @@ Web Node Editor Develop History
 	- close button
 	- max button
 	- min button
-- input text
 - group
 - window resize
 - typescript

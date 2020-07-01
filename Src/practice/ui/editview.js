@@ -36,6 +36,7 @@ const EditView = class {
     this.links = []; // all link
     this.nodes = []; // all node
     this.menu = null; // context menu
+    this.input = new Popup.Input(); // input popup
 
     var menu = new ContextMenu();
     menu.addMenu("Add");
@@ -90,16 +91,19 @@ const EditView = class {
 
     ctx.restore();
 
-    // debugging
-    ctx.font = "20px serif";
-    ctx.fillStyle = "rgba(255,255,255,1)";
-    ctx.fillText(
-      "Scroll : " + this.offset.x.toFixed(2) + ", " + this.offset.y.toFixed(2),
-      0,
-      24
-    );
-    ctx.fillText("Zoom : " + this.scale.toFixed(2), 0, 48);
-    ctx.fillText("State : " + this.state, 0, 72);
+    // debugging information
+    {
+      var ty = 30;
+      ctx.font = "20px serif";
+      ctx.fillStyle = "rgba(255,255,255,1)";
+      ctx.fillText(
+        "Scroll : " + this.offset.x.toFixed(2) + ", " + this.offset.y.toFixed(2),
+        0,
+        ty += 24
+      );
+      ctx.fillText("Zoom : " + this.scale.toFixed(2), 0, ty += 24);
+      ctx.fillText("State : " + this.state, 0, ty += 24);
+    }
   };
 
   //--------------------------------------------------------------------------------
@@ -206,6 +210,18 @@ const EditView = class {
   };
 
   //--------------------------------------------------------------------------------
+  // save
+  save = function() {
+
+  }
+
+  //--------------------------------------------------------------------------------
+  // load
+  load = function() {
+
+  }
+
+  //--------------------------------------------------------------------------------
   // Context Menu Remove
   // remove select nodes
   onRemove = () => {
@@ -289,7 +305,7 @@ const EditView = class {
           selSlot = node.getSelectSlots()[0];
         } else if (node.state === NODE_STATE_EDIT_WIDGET) {
           this.state = EDIT_STATE_EDIT_WIDGET;
-          selWidget = node.getSelectWidgets()[0];
+          selWidget = node.getSelectWidgets()[0];          
         } else {
           this.state = EDIT_STATE_MOVE_NODE;
           node.setFocus(true);
@@ -352,11 +368,20 @@ const EditView = class {
   onMouseLeftUp = (e) => {
     this.isScroll = false;
     const mousePos = this.getOriginalPos(e.offsetX, e.offsetY);
+
     var selSlot = null;
+    var selWidget = null;
     this.nodes.forEach((node) => {
+      const isInRect = node.isPointInRect(mousePos.x, mousePos.y);
       if (node.state !== NODE_STATE_NORMAL) {
+        if (isInRect) {
+          const widgets = node.getSelectWidgets();
+          if (widgets.length > 0) {
+            selWidget = widgets[0];
+          }
+        }
         node.onMouseUp(mousePos, e);
-      } else if (node.isPointInRect(mousePos.x, mousePos.y)) {
+      } else if (isInRect) {
         node.onMouseUp(mousePos, e);
 
         const slots = node.getHoverSlots();
@@ -409,6 +434,13 @@ const EditView = class {
         this.links.push(this.editLink);
       }
     }
+
+    // eidt widget?
+    if (selWidget && this.editWidget && this.state === EDIT_STATE_EDIT_WIDGET) {
+      if (!(selWidget instanceof Widgets.Boolean)) {
+        this.input.open(this.editWidget, e.offsetX, e.offsetY);
+      }
+    }    
 
     this.editLink = null;
     this.editWidget = null;
