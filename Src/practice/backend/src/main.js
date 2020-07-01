@@ -6,6 +6,7 @@ import mongoose from "mongoose";
 //import path from 'path';
 //import send from 'koa-send';
 //import api from "./api";
+//import createFakeData from './fakedata';
 
 const { PORT, MONGO_URI } = process.env;
 
@@ -17,6 +18,7 @@ mongoose
   })
   .then(() => {
     console.log("Connected to MongoDB");
+    //createFakeData();
   })
   .catch((e) => {
     console.error(e);
