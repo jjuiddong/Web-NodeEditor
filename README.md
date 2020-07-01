@@ -8,5 +8,5 @@ Node Editor with JavaScript CanvasRenderingContext2D and HTML
   - https://joshondesign.com/p/books/canvasdeepdive/toc.html
 - [Develop History (ScreenShot)](https://github.com/jjuiddong/Web-NodeEditor/wiki)
 - Recent ScreenShot
-  - <img src="https://github.com/jjuiddong/Web-NodeEditor/blob/master/Doc/variable.jpg?raw=true" width="500px"/>
+  - <img src="https://github.com/jjuiddong/Web-NodeEditor/blob/master/Doc/input%20window.jpg?raw=true" width="500px"/>
   
