@@ -102,10 +102,96 @@ Popup.Input = class {
 
   //--------------------------------------------------------------------------------
   // Popup.Input.onButtonClick
-  // cancel input
+  // complete input
   onButtonClick = () => {
     var input = this.elem.querySelector("input");
     if (input) this.setValue(input.value);
     this.close();
   };
 };
+
+//--------------------------------------------------------------------------------
+// Popup.Prompt
+//--------------------------------------------------------------------------------
+Popup.Prompt = class {
+  constructor() {
+    this.isShow = false; // show/hide input popup
+    this.parentElem = document.body; // parent element
+
+    var elem = document.createElement("div");
+    elem.className = "popup-prompt";
+    elem.style.position = "absolute";
+    this.elem = elem;
+  }
+
+  //--------------------------------------------------------------------------------
+  // Popup.Prompt.open
+  // open Prompt popup
+  open = function (title, value, callback, x, y) {
+    this.callback = callback;
+
+    const left = x || (window.innerWidth / 2) - (450/2)
+    const top = y || (window.innerHeight / 2) - (Util.convertRemToPixels(6)/2)
+    this.elem.style.left = left + "px";
+    this.elem.style.top = top + "px";
+    this.elem.innerHTML =
+      "<span>" + title + "</span>Value  <input type='text' value='' spellcheck='false'></input><button>OK</button>";
+    var input = this.elem.querySelector("input");
+    if (input) {
+      input.value = value;
+      input.addEventListener("keydown", (e) => {
+        if (e.keyCode == 13) this.onComplete();
+        else if (e.keyCode == 27) this.onCancel();
+      });
+      input.addEventListener("blur", function(e) {
+        this.focus();
+      });
+    }
+    var button = this.elem.querySelector("button");
+    if (button) {
+      button.addEventListener("click", this.onButtonClick);
+    }
+
+    if (!this.isShow) {
+        this.isShow = true;
+        this.parentElem.appendChild(this.elem);
+    }
+
+    var input = this.elem.querySelector("input");
+    if (input) input.focus();
+  };
+
+  //--------------------------------------------------------------------------------
+  // Popup.Prompt.close
+  // close prompt popup
+  close = function () {
+    if (!this.isShow) return;
+    this.isShow = false;
+    this.parentElem.removeChild(this.elem);
+  };
+
+  //--------------------------------------------------------------------------------
+  // Popup.Prompt.onComplete
+  // complete input
+  onComplete = () => {
+    var input = this.elem.querySelector("input");
+    if (input && this.callback) this.callback(input.value);
+    this.close();
+  };
+
+  //--------------------------------------------------------------------------------
+  // Popup.Prompt.onCancel
+  // cancel input
+  onCancel = () => {
+    this.close();
+  };
+
+  //--------------------------------------------------------------------------------
+  // Popup.Prompt.onButtonClick
+  // complete input
+  onButtonClick = () => {
+    var input = this.elem.querySelector("input");
+    if (input && this.callback) this.callback(input.value);
+    this.close();
+  };  
+}

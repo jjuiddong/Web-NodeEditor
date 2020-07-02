@@ -37,6 +37,7 @@ const EditView = class {
     this.nodes = []; // all node
     this.menu = null; // context menu
     this.input = new Popup.Input(); // input popup
+    this.prompt = new Popup.Prompt(); // prompt popup
 
     var menu = new ContextMenu();
     menu.addMenu("Add");
@@ -285,13 +286,19 @@ const EditView = class {
   //--------------------------------------------------------------------------------
   // save node data
   save = function () {
-    EditView_Ver1.save(this);
+    this.prompt.open('Input Title', 'nodeTitleName', (value) => {
+      //EditView_Ver1.saveLocalStorage(this, value);
+      EditView_Ver1.saveDB(this, value);
+    });
   };
 
   //--------------------------------------------------------------------------------
   // load node data
   load = function () {
-    EditView_Ver1.load(this);
+    //EditView_Ver1.loadFromLocalStorage(this);
+     this.prompt.open('Input Title', 'nodeTitleName', (value) => {
+       EditView_Ver1.loadFromDB(this, value);
+     });
   };
 
   //--------------------------------------------------------------------------------

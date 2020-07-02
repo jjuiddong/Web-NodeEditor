@@ -1,4 +1,4 @@
-import NodeFile from './model/nodefile';
+import NodeFile from './models/nodefile';
 
 export default function createFakeData() {
 

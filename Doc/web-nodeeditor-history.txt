@@ -42,14 +42,16 @@ Web Node Editor Develop History
 	-★ format
 		-★ node, link, pos, size
 	-★ local
-- backend server
+-★ backend server
 	-★ node.js
-	- save/load node information
+	-★ save/load node information
 		-★ mongodb
 			-★ create nodefile db
 			-★ model/nodefile.js setup node data schema
 			-★ test upload nodefile
-		- save/load api
+		-★ save/load api
+-★ frontend save/load
+	-★ use XMLHttpRequest, nodefile save/load
 - console window
 - interpreter
 	- generate intermediate code
