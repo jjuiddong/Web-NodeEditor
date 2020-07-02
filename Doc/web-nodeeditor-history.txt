@@ -52,6 +52,8 @@ Web Node Editor Develop History
 		-★ save/load api
 -★ frontend save/load
 	-★ use XMLHttpRequest, nodefile save/load
+-★ link animation
+	-★ line dash
 - console window
 - interpreter
 	- generate intermediate code
@@ -70,7 +72,6 @@ Web Node Editor Develop History
 - group
 - window resize
 - typescript
-- link animation
 - widgets
 	- button
 	- combo box

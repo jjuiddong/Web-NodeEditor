@@ -284,21 +284,31 @@ const EditView = class {
   }
 
   //--------------------------------------------------------------------------------
-  // save node data
-  save = function () {
+  // save node data to database
+  saveDB = function () {
     this.prompt.open('Input Title', 'nodeTitleName', (value) => {
-      //EditView_Ver1.saveLocalStorage(this, value);
       EditView_Ver1.saveDB(this, value);
     });
   };
 
   //--------------------------------------------------------------------------------
-  // load node data
-  load = function () {
-    //EditView_Ver1.loadFromLocalStorage(this);
+  // load node data from database
+  loadDB = function () {
      this.prompt.open('Input Title', 'nodeTitleName', (value) => {
        EditView_Ver1.loadFromDB(this, value);
      });
+  };
+
+  //--------------------------------------------------------------------------------
+  // save node data to local storage
+  saveLocalStorage = function () {
+     EditView_Ver1.saveLocalStorage(this, 'title');
+  };
+
+  //--------------------------------------------------------------------------------
+  // load node data from local storage
+  loadLocalStorage = function () {
+    EditView_Ver1.loadFromLocalStorage(this);
   };
 
   //--------------------------------------------------------------------------------
