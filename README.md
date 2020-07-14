@@ -9,6 +9,7 @@ Node Editor with JavaScript CanvasRenderingContext2D and HTML
 - Node.js Backend Webserver
   - MongoDB
   - nodefile save/load api  
+- TypeScript
 - [Develop History (ScreenShot)](https://github.com/jjuiddong/Web-NodeEditor/wiki)
 - Recent ScreenShot
   - <img src="https://github.com/jjuiddong/Web-NodeEditor/blob/master/Doc/link-ani.jpg?raw=true" width="500px"/>
