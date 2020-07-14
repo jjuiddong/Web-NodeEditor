@@ -54,8 +54,8 @@ Web Node Editor Develop History
 	-★ use XMLHttpRequest, nodefile save/load
 -★ link animation
 	-★ line dash
-- typescript
-	- refactoring
+-★ typescript
+	-★ refactoring
 - console window
 - interpreter
 	- generate intermediate code
