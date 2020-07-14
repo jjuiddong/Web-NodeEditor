@@ -8,8 +8,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // context menu class
 //   - menu item
 //
-//  - 2020-07-13
-//    - TypeScript Refactoring
+// 2020-07-13
+//  - TypeScript Refactoring
 //
 var config_1 = __importDefault(require("./config"));
 var util_1 = __importDefault(require("./util"));

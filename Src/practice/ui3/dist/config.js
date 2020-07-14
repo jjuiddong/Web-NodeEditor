@@ -4,8 +4,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // 2020-06-24, jjuiddong
 // configuration class
 //
-//  - 2020-07-13
-//    - TypeScript Refactoring
+// 2020-07-13
+//  - TypeScript Refactoring
 //
 var Config = /** @class */ (function () {
     function Config() {

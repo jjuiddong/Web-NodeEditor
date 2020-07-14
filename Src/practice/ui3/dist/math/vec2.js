@@ -1,7 +1,10 @@
 "use strict";
 //
-// 2020-07-13, jjuiddong
+// 2020-06-25, jjuiddong
 // 2D vector
+//
+// 2020-07-13
+//  - TypeScript Refactoring
 //
 Object.defineProperty(exports, "__esModule", { value: true });
 var Vec2 = /** @class */ (function () {

@@ -3,8 +3,8 @@
 // context menu class
 //   - menu item
 //
-//  - 2020-07-13
-//    - TypeScript Refactoring
+// 2020-07-13
+//  - TypeScript Refactoring
 //
 import Config from './config'
 import Util from './util'

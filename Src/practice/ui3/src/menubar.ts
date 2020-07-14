@@ -2,8 +2,8 @@
 // 2020-07-01, jjuiddong
 // MenuBar class
 //
-//  - 2020-07-01
-//    - TypeScript Refactoring
+// 2020-07-01
+//  - TypeScript Refactoring
 //
 import EditView from './editview'
 

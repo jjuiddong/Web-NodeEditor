@@ -10,24 +10,33 @@ Object.defineProperty(exports, "__esModule", { value: true });
 //  - render node
 //  - render link
 //
-//  - 2020-07-13
-//      - TypeScript Refactoring
+// 2020-07-13
+//  - TypeScript Refactoring
 //
 var vec2_1 = __importDefault(require("./math/vec2"));
 var context_menu_1 = __importDefault(require("./context_menu"));
+var node_1 = require("./node");
+var slot_1 = require("./slot");
+var link_1 = __importDefault(require("./link"));
+var widgets_1 = require("./widgets");
 var node_spawn_1 = __importDefault(require("./node_spawn"));
-var EDIT_STATE_NORMAL = 0;
-var EDIT_STATE_SCROLL = 1;
-var EDIT_STATE_MOVE_NODE = 2;
-var EDIT_STATE_EDIT_LINK = 3;
-var EDIT_STATE_EDIT_WIDGET = 4;
+var popup_1 = require("./popup");
+var editview_ver1_1 = __importDefault(require("./editview_ver1"));
+var EditState;
+(function (EditState) {
+    EditState[EditState["Normal"] = 0] = "Normal";
+    EditState[EditState["Scroll"] = 1] = "Scroll";
+    EditState[EditState["MoveNode"] = 2] = "MoveNode";
+    EditState[EditState["EditLink"] = 3] = "EditLink";
+    EditState[EditState["EditWidget"] = 4] = "EditWidget";
+})(EditState || (EditState = {}));
 var EditView = /** @class */ (function () {
     function EditView(canvas, width, // view width
     height // view height
     ) {
         var _this = this;
         this.ctx = null;
-        this.state = EDIT_STATE_NORMAL;
+        this.state = EditState.Normal;
         this.isFocus = false;
         this.width = 0;
         this.height = 0;
@@ -41,8 +50,17 @@ var EditView = /** @class */ (function () {
         this.pattern = null;
         this.editLink = null;
         this.editWidget = null;
+        this.links = [];
         this.nodes = [];
         this.menu = null;
+        this.input = new popup_1.Popup.Input();
+        this.prompt = new popup_1.Popup.Prompt();
+        //--------------------------------------------------------------------------------
+        // recalc node position, link position
+        // node : move node
+        this.calcNodeLayoutAll = function () {
+            // nothing~
+        };
         //--------------------------------------------------------------------------------
         // return mouse original pos
         // calc zoom in/out, offset
@@ -56,28 +74,27 @@ var EditView = /** @class */ (function () {
             return curPos;
         };
         //--------------------------------------------------------------------------------
-        // save node data to database
-        this.saveDB = function () {
-            // this.prompt.open('Input Title', 'nodeTitleName', (value) => {
-            //     EditView_Ver1.saveDB(this, value);
-            // });
-        };
-        //--------------------------------------------------------------------------------
-        // load node data from database
-        this.loadDB = function () {
-            // this.prompt.open('Input Title', 'nodeTitleName', (value) => {
-            //     EditView_Ver1.loadFromDB(this, value);
-            // });
-        };
-        //--------------------------------------------------------------------------------
-        // save node data to local storage
-        this.saveLocalStorage = function () {
-            // EditView_Ver1.saveLocalStorage(this, 'title');
-        };
-        //--------------------------------------------------------------------------------
-        // load node data from local storage
-        this.loadLocalStorage = function () {
-            // EditView_Ver1.loadFromLocalStorage(this);
+        // Context Menu Remove
+        // remove select nodes
+        this.onRemove = function () {
+            // collect remove link
+            var rmLinks = [];
+            for (var _i = 0, _a = _this.nodes; _i < _a.length; _i++) {
+                var node = _a[_i];
+                if (node.isFocus) {
+                    for (var _b = 0, _c = node.inputs; _b < _c.length; _b++) {
+                        var slot = _c[_b];
+                        rmLinks = rmLinks.concat(_this.getLinkFromSlot(slot.id));
+                    }
+                    for (var _d = 0, _e = node.outputs; _d < _e.length; _d++) {
+                        var slot = _e[_d];
+                        rmLinks = rmLinks.concat(_this.getLinkFromSlot(slot.id));
+                    }
+                }
+            }
+            _this.removeLinks(rmLinks);
+            // remove node
+            _this.nodes = _this.nodes.filter(function (node) { return !node.isFocus; });
         };
         //--------------------------------------------------------------------------------
         // mouse move event handling
@@ -91,25 +108,27 @@ var EditView = /** @class */ (function () {
             }
             var mousePos = _this.getOriginalPos(e.offsetX, e.offsetY);
             var selNode = null;
-            // this.nodes.forEach((node) => {
-            //   if (node.state === NODE_STATE_SELECT) {
-            //     selNode = node;
-            //     node.move(mousePos.x + node.offset.x, mousePos.y + node.offset.y);
-            //     if (this.state === EDIT_STATE_MOVE_NODE) this.calcNodeLayout(selNode);
-            //   }
-            //   if (node.state === NODE_STATE_EDIT_WIDGET) {
-            //     // nothing~
-            //   } else {
-            //     if (node.isPointInRect(mousePos.x, mousePos.y))
-            //       node.onMouseMove(mousePos, e);
-            //   }
-            // });
-            // if (this.editLink && this.state === EDIT_STATE_EDIT_LINK) {
-            //   this.editLink.setP1(mousePos);
-            // }
-            // if (this.editWidget && this.state === EDIT_STATE_EDIT_WIDGET) {
-            //   this.editWidget.onMouseMove(mousePos, e);
-            // }
+            _this.nodes.forEach(function (node) {
+                if (node.state === node_1.NodeState.Select) {
+                    selNode = node;
+                    node.move(mousePos.x + node.offset.x, mousePos.y + node.offset.y);
+                    if (_this.state === EditState.MoveNode)
+                        _this.calcNodeLayout(selNode);
+                }
+                if (node.state === node_1.NodeState.EditWidget) {
+                    // nothing~
+                }
+                else {
+                    if (node.isPointInRect(mousePos.x, mousePos.y))
+                        node.onMouseMove(mousePos, e);
+                }
+            });
+            if (_this.editLink && _this.state === EditState.EditLink) {
+                _this.editLink.setP1(mousePos);
+            }
+            if (_this.editWidget && _this.state === EditState.EditWidget) {
+                _this.editWidget.onMouseMove(mousePos, e);
+            }
         };
         //--------------------------------------------------------------------------------
         // mouse down event handling
@@ -125,53 +144,41 @@ var EditView = /** @class */ (function () {
             (_a = _this.menu) === null || _a === void 0 ? void 0 : _a.close();
             var isSelect = false;
             var mousePos = _this.getOriginalPos(e.offsetX, e.offsetY);
-            var selSlot = null;
-            var selWidget = null;
-            // this.nodes.forEach((node) => {
-            //   if (node.isPointInRect(mousePos.x, mousePos.y)) {
-            //     isSelect = true;
-            //     node.onMouseDown(mousePos, e);
-            //     if (node.state === NODE_STATE_EDIT_SLOT) {
-            //       this.state = EDIT_STATE_EDIT_LINK;
-            //       selSlot = node.getSelectSlots()[0];
-            //     } else if (node.state === NODE_STATE_EDIT_WIDGET) {
-            //       this.state = EDIT_STATE_EDIT_WIDGET;
-            //       selWidget = node.getSelectWidgets()[0];
-            //     } else {
-            //       this.state = EDIT_STATE_MOVE_NODE;
-            //       node.setFocus(true);
-            //       node.offset.set2(node.rect.x - mousePos.x, node.rect.y - mousePos.y);
-            //     }
-            //   } else {
-            //     node.isFocus = false;
-            //   }
-            // });
+            _this.nodes.forEach(function (node) {
+                if (node.isPointInRect(mousePos.x, mousePos.y)) {
+                    isSelect = true;
+                    node.onMouseDown(mousePos, e);
+                    if (node.state === node_1.NodeState.EditSlot) {
+                        _this.state = EditState.EditLink;
+                        var selSlot = node.getSelectSlots()[0];
+                        _this.editLink = new link_1.default(-1, selSlot.id, -1, selSlot.getPos(), mousePos);
+                    }
+                    else if (node.state === node_1.NodeState.EditWidget) {
+                        _this.state = EditState.EditWidget;
+                        _this.editWidget = node.getSelectWidgets()[0];
+                    }
+                    else {
+                        _this.state = EditState.MoveNode;
+                        node.setFocus(true);
+                        node.offset.set2(node.rect.x - mousePos.x, node.rect.y - mousePos.y);
+                    }
+                }
+                else {
+                    node.isFocus = false;
+                }
+            });
             // scroll?
             if (!isSelect) {
                 _this.isScroll = true;
-                _this.state = EDIT_STATE_SCROLL;
+                _this.state = EditState.Scroll;
                 _this.clickPos.set2(e.offsetX, e.offsetY);
                 _this.prevPos.set2(e.offsetX, e.offsetY);
-            }
-            // edit link
-            if (selSlot && _this.state === EDIT_STATE_EDIT_LINK) {
-                //   this.editLink = new Link(
-                //     (option = {
-                //       from: selSlot.id,
-                //       p0: selSlot.getPos(),
-                //       p1: mousePos,
-                //     })
-                //   );
-            }
-            // eidt widget
-            if (selWidget && _this.state === EDIT_STATE_EDIT_WIDGET) {
-                _this.editWidget = selWidget;
             }
         };
         //--------------------------------------------------------------------------------
         // mouse up event handling
         this.onMouseUp = function (e) {
-            var _a;
+            var _a, _b;
             if (e.button === 0) {
                 _this.onMouseLeftUp(e);
             }
@@ -180,9 +187,9 @@ var EditView = /** @class */ (function () {
                 var mousePos = _this.getOriginalPos(e.offsetX, e.offsetY);
                 _this.mousePos.set(mousePos);
                 // // check focus node
-                // const nodes = this.nodes.filter((node) => node.isFocus);
-                // this.menu.setMenuEnable("Remove", nodes.length > 0);
-                (_a = _this.menu) === null || _a === void 0 ? void 0 : _a.open(e.offsetX + 5, e.offsetY + 5);
+                var nodes = _this.nodes.filter(function (node) { return node.isFocus; });
+                (_a = _this.menu) === null || _a === void 0 ? void 0 : _a.setMenuEnable("Remove", nodes.length > 0);
+                (_b = _this.menu) === null || _b === void 0 ? void 0 : _b.open(e.offsetX + 5, e.offsetY + 5);
                 e.preventDefault();
                 e.stopPropagation();
                 return false;
@@ -193,44 +200,57 @@ var EditView = /** @class */ (function () {
         this.onMouseLeftUp = function (e) {
             _this.isScroll = false;
             var mousePos = _this.getOriginalPos(e.offsetX, e.offsetY);
-            // var selSlot = null;
-            // var selWidget = null;
-            // this.nodes.forEach((node) => {
-            //   const isInRect = node.isPointInRect(mousePos.x, mousePos.y);
-            //   if (node.state !== NODE_STATE_NORMAL) {
-            //     if (isInRect) {
-            //       const widgets = node.getSelectWidgets();
-            //       if (widgets.length > 0) {
-            //         selWidget = widgets[0];
-            //       }
-            //     }
-            //     node.onMouseUp(mousePos, e);
-            //   } else if (isInRect) {
-            //     node.onMouseUp(mousePos, e);
-            //     const slots = node.getHoverSlots();
-            //     if (slots.length > 0) {
-            //       selSlot = slots[0];
-            //     }
-            //   }
-            // });
-            // // create link?
-            // if (this.editLink && selSlot && this.state === EDIT_STATE_EDIT_LINK) {
-            //   this.editLink.setTo(selSlot.id);
-            //   this.addLink(this.editLink);
-            // }
-            // // eidt widget?
-            // if (selWidget && this.editWidget && this.state === EDIT_STATE_EDIT_WIDGET) {
-            //   if (!(selWidget instanceof Widgets.Boolean)) {
-            //     this.input.open(this.editWidget, e.offsetX, e.offsetY);
-            //   }
-            // }
-            // this.editLink = null;
-            // this.editWidget = null;
-            // this.state = EDIT_STATE_NORMAL;
+            //var selSlot: Slot | null = null;
+            //var selWidget = null;
+            _this.nodes.forEach(function (node) {
+                var isInRect = node.isPointInRect(mousePos.x, mousePos.y);
+                if (node.state !== node_1.NodeState.Normal) {
+                    if (isInRect) {
+                        var widgets = node.getSelectWidgets();
+                        if (widgets.length > 0) {
+                            var selWidget = widgets[0];
+                            // eidt widget?
+                            if (_this.editWidget && _this.state === EditState.EditWidget) {
+                                if (!(selWidget instanceof widgets_1.Widgets.Boolean)) {
+                                    _this.input.open(_this.editWidget, e.offsetX, e.offsetY);
+                                }
+                            }
+                        }
+                    }
+                    node.onMouseUp(mousePos, e);
+                }
+                else if (isInRect) {
+                    node.onMouseUp(mousePos, e);
+                    var slots = node.getHoverSlots();
+                    if (slots.length > 0) {
+                        var selSlot = slots[0];
+                        if (_this.editLink && selSlot && _this.state === EditState.EditLink) {
+                            _this.editLink.setTo(selSlot.id);
+                            _this.addLink(_this.editLink);
+                        }
+                    }
+                }
+            });
+            _this.editLink = null;
+            _this.editWidget = null;
+            _this.state = EditState.Normal;
         };
         //--------------------------------------------------------------------------------
         // mouse up event handling
         this.onMouseDBClick = function (e) {
+            var mousePos = _this.getOriginalPos(e.offsetX, e.offsetY);
+            _this.nodes.forEach(function (node) {
+                if (node.isPointInRect(mousePos.x, mousePos.y)) {
+                    node.onMouseDBClick(mousePos, e);
+                    // remove select slot link
+                    var slots = node.getSelectSlots();
+                    if (slots.length > 0) {
+                        var selSlot = slots[0];
+                        var rmLinks = _this.getLinkFromSlot(selSlot.id);
+                        _this.removeLinks(rmLinks);
+                    }
+                }
+            });
         };
         //--------------------------------------------------------------------------------
         // mouse wheel event handling
@@ -267,7 +287,7 @@ var EditView = /** @class */ (function () {
         this.height = height;
         var menu = new context_menu_1.default();
         menu.addMenu("Add");
-        //menu.addMenu("Remove", this.onRemove);
+        menu.addMenu("Remove", this.onRemove);
         menu.addMenu("Group", function () { return console.log("Group"); });
         menu.addSubMenu("Add", "Variable");
         menu.addSubMenu("Add", "Function");
@@ -280,19 +300,19 @@ var EditView = /** @class */ (function () {
         menu.addSubMenu("Add&Variable", "String", function () {
             return _this.nodes.push(node_spawn_1.default.String(_this.mousePos));
         });
-        // menu.addSubMenu("Add&Function", "Node1", () =>
-        //   //this.nodes.push(SpawnNode.Node1(this.mousePos))
-        // );
-        // menu.addSubMenu("Add&Function", "Node2", () =>
-        //   //this.nodes.push(SpawnNode.Node2(this.mousePos))
-        // );
-        // menu.addSubMenu("Add&Function", "Node3", () =>
-        //   //this.nodes.push(SpawnNode.Node3(this.mousePos))
-        // );
-        // menu.addSubMenu("Add&Function", "Node4");
-        // menu.addSubMenu("Add&Function", "Console", () =>
-        //   //this.nodes.push(SpawnNode.Console(this.mousePos))
-        // );
+        menu.addSubMenu("Add&Function", "Node1", function () {
+            return _this.nodes.push(node_spawn_1.default.Node1(_this.mousePos));
+        });
+        menu.addSubMenu("Add&Function", "Node2", function () {
+            return _this.nodes.push(node_spawn_1.default.Node2(_this.mousePos));
+        });
+        menu.addSubMenu("Add&Function", "Node3", function () {
+            return _this.nodes.push(node_spawn_1.default.Node3(_this.mousePos));
+        });
+        menu.addSubMenu("Add&Function", "Node4");
+        menu.addSubMenu("Add&Function", "Console", function () {
+            return _this.nodes.push(node_spawn_1.default.Console(_this.mousePos));
+        });
         this.menu = menu;
         canvas.addEventListener("mousemove", this.onMouseMove);
         canvas.addEventListener("mousedown", this.onMouseDown);
@@ -314,9 +334,12 @@ var EditView = /** @class */ (function () {
             ctx.fillRect(this.offset.x, this.offset.y, this.width / this.scale, this.height / this.scale);
             ctx.imageSmoothingEnabled = true;
         }
-        //
+        // render link
+        this.links.forEach(function (link) { return link.render(ctx); });
         // render nodes
         this.nodes.forEach(function (node) { return node.render(ctx); });
+        if (this.editLink)
+            this.editLink.render(ctx);
         ctx.restore();
         // debugging information
         {
@@ -331,6 +354,170 @@ var EditView = /** @class */ (function () {
             ctx.fillText("State : " + this.state, 0, (ty += 24));
         }
     };
+    //--------------------------------------------------------------------------------
+    // get slot
+    EditView.prototype.getSlotInNode = function (node, slotId) {
+        var result1 = node.inputs.filter(function (slot) { return slot.id === slotId; });
+        if (result1.length > 0)
+            return result1[0];
+        var result2 = node.outputs.filter(function (slot) { return slot.id === slotId; });
+        if (result2.length > 0)
+            return result2[0];
+        return null;
+    };
+    ;
+    //--------------------------------------------------------------------------------
+    // get slot
+    // return slot has slotId
+    EditView.prototype.getSlot = function (slotId) {
+        var _this = this;
+        var slot = null;
+        this.nodes.forEach(function (node) {
+            var result = _this.getSlotInNode(node, slotId);
+            if (result) {
+                slot = result;
+            }
+        });
+        return slot;
+    };
+    ;
+    //--------------------------------------------------------------------------------
+    // get node from slot
+    // return node has slot
+    EditView.prototype.getNodeFromSlot = function (slotId) {
+        var _this = this;
+        var nodeHasSlot = null;
+        this.nodes.forEach(function (node) {
+            var result = _this.getSlotInNode(node, slotId);
+            if (result) {
+                nodeHasSlot = node;
+            }
+        });
+        return nodeHasSlot;
+    };
+    ;
+    //--------------------------------------------------------------------------------
+    // get link has slot
+    // return link array
+    EditView.prototype.getLinkFromSlot = function (slotId) {
+        var links = this.links.filter(function (link) { return link.from === slotId || link.to === slotId; });
+        return links;
+    };
+    ;
+    //--------------------------------------------------------------------------------
+    // add link
+    // link: Link instance
+    EditView.prototype.addLink = function (newLink) {
+        //this.editLink.setTo(selSlot.id);
+        //this.editLink.setP1(selSlot.getPos());
+        var frSlot = this.getSlot(newLink.from);
+        var toSlot = this.getSlot(newLink.to);
+        var frNode = this.getNodeFromSlot(newLink.from);
+        var toNode = this.getNodeFromSlot(newLink.to);
+        var existLink = this.links.find(function (link) {
+            return (link.from === newLink.from && link.to === newLink.to) ||
+                (link.to === newLink.from && link.from === newLink.to);
+        });
+        // check valid link?
+        if (!newLink.to ||
+            !newLink.from ||
+            newLink.to === newLink.from ||
+            frNode === toNode ||
+            existLink ||
+            !frSlot ||
+            !toSlot ||
+            (frSlot && toSlot && frSlot.type === toSlot.type)) {
+            // invalid link, ignore
+        }
+        else {
+            // valid link
+            // exchange from=input, to=output
+            var input = frSlot.type === slot_1.SlotType.Input ? frSlot : toSlot;
+            var output = toSlot.type === slot_1.SlotType.Output ? toSlot : frSlot;
+            newLink.setFrom(input.id);
+            newLink.setP0(input.getPos());
+            newLink.setTo(output.id);
+            newLink.setP1(output.getPos());
+            frSlot.setLink(true);
+            toSlot.setLink(true);
+            this.links.push(newLink);
+        }
+    };
+    //--------------------------------------------------------------------------------
+    // recalc link from,to position
+    // node : move node
+    EditView.prototype.calcNodeLayout = function (node) {
+        var _this = this;
+        var calcFn = function (links, slot) {
+            var link1 = links.filter(function (link) { return link.to === slot.id; });
+            link1.forEach(function (link) { return link.setP1(slot.getPos()); });
+            var link2 = links.filter(function (link) { return link.from === slot.id; });
+            link2.forEach(function (link) { return link.setP0(slot.getPos()); });
+        };
+        node.inputs.forEach(function (slot) { return calcFn(_this.links, slot); });
+        node.outputs.forEach(function (slot) { return calcFn(_this.links, slot); });
+    };
+    ;
+    //--------------------------------------------------------------------------------
+    // Remove Links
+    // rmLinks: array link
+    EditView.prototype.removeLinks = function (rmLinks) {
+        var _this = this;
+        // remove link
+        this.links = this.links.filter(function (link) { return !rmLinks.find(function (r) { return r.id === link.id; }); });
+        // refresh slot state
+        rmLinks.forEach(function (link) {
+            var frSlot = _this.getSlot(link.from);
+            var toSlot = _this.getSlot(link.to);
+            if (frSlot) {
+                frSlot.setLink(_this.getLinkFromSlot(frSlot.id).length !== 0);
+            }
+            if (toSlot) {
+                toSlot.setLink(_this.getLinkFromSlot(toSlot.id).length !== 0);
+            }
+        });
+    };
+    ;
+    //--------------------------------------------------------------------------------
+    // close document
+    // remove node, link, etc
+    EditView.prototype.closeDocument = function () {
+        this.nodes = [];
+        this.links = [];
+        this.editLink = null;
+        this.editWidget = null;
+        this.input.close();
+    };
+    //--------------------------------------------------------------------------------
+    // save node data to database
+    EditView.prototype.saveDB = function () {
+        var _this = this;
+        this.prompt.open('Input Title', 'nodeTitleName', function (value) {
+            editview_ver1_1.default.saveDB(_this, value);
+        });
+    };
+    ;
+    //--------------------------------------------------------------------------------
+    // load node data from database
+    EditView.prototype.loadDB = function () {
+        var _this = this;
+        this.prompt.open('Input Title', 'nodeTitleName', function (value) {
+            editview_ver1_1.default.loadFromDB(_this, value);
+        });
+    };
+    ;
+    //--------------------------------------------------------------------------------
+    // save node data to local storage
+    EditView.prototype.saveLocalStorage = function () {
+        editview_ver1_1.default.saveLocalStorage(this, 'title');
+    };
+    ;
+    //--------------------------------------------------------------------------------
+    // load node data from local storage
+    EditView.prototype.loadLocalStorage = function () {
+        editview_ver1_1.default.loadFromLocalStorage(this);
+    };
+    ;
     return EditView;
 }());
 exports.default = EditView;

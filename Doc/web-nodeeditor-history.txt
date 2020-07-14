@@ -55,6 +55,7 @@ Web Node Editor Develop History
 -★ link animation
 	-★ line dash
 - typescript
+	- refactoring
 - console window
 - interpreter
 	- generate intermediate code

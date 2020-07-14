@@ -2,8 +2,8 @@
 // 2020-06-24, jjuiddong
 // configuration class
 //
-//  - 2020-07-13
-//    - TypeScript Refactoring
+// 2020-07-13
+//  - TypeScript Refactoring
 //
 export default class Config {
   constructor() {}

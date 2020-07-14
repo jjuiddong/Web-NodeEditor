@@ -2,8 +2,8 @@
 // 2020-06-26, jjuiddong
 // Utility class
 //
-//  - 2020-07-13
-//    - TypeScript Refactoring
+// 2020-07-13
+//  - TypeScript Refactoring
 //
 export default class Util {
   static seed: number = 10000;
@@ -48,8 +48,8 @@ export default class Util {
     width: number,
     height: number,
     radius: number,
-    fillStyle: string,
-    strokeStyle: string) {
+    fillStyle: string|null = null,
+    strokeStyle: string|null = null) {
 
     ctx.beginPath();
     ctx.moveTo(x, y + radius);
@@ -139,28 +139,30 @@ export default class Util {
   // check avilable storage
   // https://developer.mozilla.org/ko/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API
   // ex) Util.storageAvailable('localStorage')
-  static storageAvailable(type:string) {
-    // var storage;
-    // try {
-    //   storage = window[type];
-    //   var x = '__storage_test__';
-    //   storage.setItem(x, x);
-    //   storage.removeItem(x);
-    //   return true;
-    // }
-    // catch (e) {
-    //   return e instanceof DOMException && (
-    //     // Firefox를 제외한 모든 브라우저
-    //     e.code === 22 ||
-    //     // Firefox
-    //     e.code === 1014 ||
-    //     // 코드가 존재하지 않을 수도 있기 떄문에 이름 필드도 확인합니다.
-    //     // Firefox를 제외한 모든 브라우저
-    //     e.name === 'QuotaExceededError' ||
-    //     // Firefox
-    //     e.name === 'NS_ERROR_DOM_QUOTA_REACHED') &&
-    //     // 이미 저장된 것이있는 경우에만 QuotaExceededError를 확인하십시오.
-    //     (storage && storage.length !== 0);
-    // }
+  static storageAvailable(type:any) : boolean {
+    var storage : Storage | null = null;
+    try {
+      //storage = window[type];
+      storage = window.localStorage;
+      var x = '__storage_test__';
+      storage.setItem(x, x);
+      storage.removeItem(x);
+      return true;
+    }
+    catch (e) {
+      return e instanceof DOMException && (
+          // Firefox를 제외한 모든 브라우저
+         e.code === 22 ||
+        // Firefox
+         e.code === 1014 ||
+        // 코드가 존재하지 않을 수도 있기 떄문에 이름 필드도 확인합니다.
+        // Firefox를 제외한 모든 브라우저
+         e.name === 'QuotaExceededError' ||
+        // Firefox
+        e.name === 'NS_ERROR_DOM_QUOTA_REACHED') &&
+        // 이미 저장된 것이있는 경우에만 QuotaExceededError를 확인하십시오.
+        ((storage !== null) && storage.length !== 0);
+    }
+    return false
   }
 };
